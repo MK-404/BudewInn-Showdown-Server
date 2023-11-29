@@ -5,7 +5,7 @@
  *
  * @type {number}
  */
-exports.port = 8000;
+exports.port = 2095;
 
 /**
  * The server address - the address at which Pokemon Showdown should be hosting
@@ -66,7 +66,7 @@ exports.ssl = null;
 /*
 // example:
 exports.ssl = {
-	port: 443,
+	port: 2053,
 	options: {
 		key: './config/ssl/privkey.pem',
 		cert: './config/ssl/fullchain.pem',
