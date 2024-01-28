@@ -1293,20 +1293,13 @@ RANGE,5.254.0.0,5.254.127.255,voxility.com?/proxy
 RANGE,5.254.128.0,5.254.159.255,vpntunnel.se?/proxy
 RANGE,8.4.9.128,8.4.9.255,co-location.com?/proxy
 RANGE,8.4.34.0,8.4.35.255,peakwebhosting.com?/proxy
-RANGE,8.6.112.0,8.6.112.255,cloudflare.com?/proxy
-RANGE,8.6.145.0,8.6.145.255,cloudflare.com?/proxy
 RANGE,8.6.220.0,8.6.223.255,hostway.com?/proxy
 RANGE,8.8.40.0,8.8.40.255,co-location.com?/proxy
 RANGE,8.15.3.0,8.15.3.255,co-location.com?/proxy
-RANGE,8.21.13.0,8.21.13.255,cloudflare.com?/proxy?/proxy
 RANGE,8.24.248.0,8.24.255.255,gorack.net?/proxy
 RANGE,8.26.56.0,8.26.56.255,peak10.com?/proxy
 RANGE,8.30.160.0,8.30.167.255,nativehosting.com?/proxy
-RANGE,8.38.147.0,8.38.147.255,cloudflare.com?/proxy
-RANGE,8.40.111.0,8.40.111.255,cloudflare.com?/proxy
-RANGE,8.45.41.0,8.45.47.255,cloudflare.com?/proxy
 RANGE,8.46.72.0,8.46.79.255,gogoair.com?/proxy
-RANGE,8.46.113.0,8.46.119.255,cloudflare.com?/proxy
 RANGE,12.16.248.192,12.16.248.199,mediatemple.net?/proxy
 RANGE,12.27.226.168,12.27.226.175,mediatemple.net?/proxy
 RANGE,12.54.126.240,12.54.126.247,godaddy.com?/proxy
@@ -3230,7 +3223,6 @@ RANGE,103.246.250.0,103.246.251.255,quickweb.co.nz?/proxy
 RANGE,103.253.40.0,103.253.43.255,hosthongkong.net?/proxy
 RANGE,103.253.144.0,103.253.147.255,digitalocean.com?/proxy
 RANGE,103.254.152.0,103.254.155.255,leaseweb.com?/proxy
-RANGE,104.16.0.0,104.31.255.255,cloudflare.com?/proxy
 RANGE,104.37.0.0,104.37.7.255,pointtoserver.com?/proxy
 RANGE,104.37.24.0,104.37.31.255,web2objects.com?/proxy
 RANGE,104.37.184.0,104.37.191.255,interserver.net?/proxy
@@ -3367,7 +3359,6 @@ RANGE,108.60.64.0,108.60.95.255,techiemedia.net?/proxy
 RANGE,108.61.0.0,108.61.255.255,choopa.com?/proxy
 RANGE,108.62.0.0,108.62.255.255,ubiquityservers.com?/proxy
 RANGE,108.160.144.0,108.160.159.255,privatesystems.net?/proxy
-RANGE,108.162.192.0,108.162.255.255,cloudflare.com?/proxy
 RANGE,108.163.128.0,108.163.191.255,iweb.com?/proxy
 RANGE,108.163.192.0,108.163.255.255,singlehop.com?/proxy
 RANGE,108.166.0.0,108.166.127.255,rackspace.com?/proxy
@@ -3531,7 +3522,6 @@ RANGE,141.0.8.0,141.0.11.255,opera.com?/proxy
 RANGE,141.0.160.0,141.0.167.255,nublue.co.uk?/proxy
 RANGE,141.98.100.0,141.98.103.255,m247.com?/proxy
 RANGE,141.98.252.0,141.98.255.255,31173.se?/proxy
-RANGE,141.101.64.0,141.101.127.255,cloudflare.com?/proxy
 RANGE,141.105.64.0,141.105.71.255,hostkey.com?/proxy
 RANGE,141.138.136.0,141.138.143.255,transip.nl?/proxy
 RANGE,142.0.32.0,142.0.47.255,volumedrive.com?/proxy
@@ -3638,7 +3628,6 @@ RANGE,159.253.128.0,159.253.159.255,softlayer.com?/proxy
 RANGE,160.116.0.0,160.116.255.255,affiliatedcomputingservices.co.za?/proxy
 RANGE,161.35.0.0,161.35.255.255,digitalocean.com?/proxy
 RANGE,161.202.0.0,161.202.255.255,softlayer.com?/proxy
-RANGE,162.158.0.0,162.159.255.255,cloudflare.com?/proxy
 RANGE,162.208.8.0,162.208.11.255,vpscheap.net?/proxy
 RANGE,162.209.0.0,162.209.127.255,rackspace.com?/proxy
 RANGE,162.210.192.0,162.210.199.255,leaseweb.com?/proxy
@@ -3731,7 +3720,6 @@ RANGE,168.235.144.0,168.235.159.255,kwdatacentre.com?/proxy
 RANGE,169.38.0.0,169.38.255.255,softlayer.com?/proxy
 RANGE,171.22.76.0,171.22.79.255,hugeserver.com?/proxy
 RANGE,171.25.193.0,171.25.193.255,dfri.se?/proxy
-RANGE,172.64.0.0,172.71.255.255,cloudflare.com?/proxy
 RANGE,172.82.128.0,172.82.191.255,quickpacket.com?/proxy
 RANGE,172.83.40.0,172.83.47.255,totalserversolutions.com?/proxy
 RANGE,172.86.64.0,172.86.127.255,frantech.ca?/proxy
@@ -3805,7 +3793,6 @@ RANGE,173.243.112.0,173.243.127.255,continuumdatacenters.com?/proxy
 RANGE,173.244.35.0,173.244.60.255,logicweb.com?/proxy
 RANGE,173.244.64.0,173.244.79.255,gogrid.com?/proxy
 RANGE,173.244.192.0,173.244.223.255,midphase.com?/proxy
-RANGE,173.245.48.0,173.245.63.255,cloudflare.com?/proxy
 RANGE,173.245.64.0,173.245.95.255,egihosting.com?/proxy
 RANGE,173.245.192.0,173.245.223.255,bandcon.com?/proxy
 RANGE,173.246.96.0,173.246.111.255,gandi.net?/proxy
@@ -4310,7 +4297,7 @@ RANGE,189.113.160.0,189.113.175.255,hostrevenda.com?/proxy
 RANGE,190.2.128.0,190.2.191.255,worldstream.nl?/proxy
 RANGE,190.4.88.0,190.4.91.255,hostarica.com?/proxy
 RANGE,190.14.0.0,190.14.15.255,premiodigital.com?/proxy
-RANGE,190.93.240.0,190.93.255.255,cloudflare.com?/proxy
+
 RANGE,190.105.224.0,190.105.239.255,latincloud.com?/proxy
 RANGE,190.106.128.0,190.106.159.255,g2khosting.com?/proxy
 RANGE,190.112.220.0,190.112.223.255,racknation.cr?/proxy
@@ -4650,7 +4637,7 @@ RANGE,198.23.128.0,198.23.255.255,colocrossing.com?/proxy
 RANGE,198.24.128.0,198.24.191.255,securedservers.com?/proxy
 RANGE,198.27.64.0,198.27.127.255,ovh.co.uk?/proxy
 RANGE,198.37.120.0,198.37.127.255,vivid-hosting.net?/proxy
-RANGE,198.41.128.0,198.41.255.255,cloudflare.com?/proxy
+
 RANGE,198.44.0.0,198.44.127.255,hostwinds.com?/proxy
 RANGE,198.46.128.0,198.46.255.255,colocrossing.com?/proxy
 RANGE,198.47.115.0,198.47.115.255,anchorfree?/proxy
@@ -4724,7 +4711,6 @@ RANGE,199.19.224.0,199.19.227.255,buyvm.net?/proxy
 RANGE,199.21.112.0,199.21.115.255,colocrossing.com?/proxy
 RANGE,199.21.148.0,199.21.151.255,yesup.com?/proxy
 RANGE,199.26.84.0,199.26.87.255,dfw-datacenter.com?/proxy
-RANGE,199.27.128.0,199.27.135.255,cloudflare.com?/proxy
 RANGE,199.30.48.0,199.30.55.255,ioflood.com?/proxy
 RANGE,199.30.64.0,199.30.67.255,http:?/proxy
 RANGE,199.33.120.0,199.33.127.255,rebelhosting.net?/proxy

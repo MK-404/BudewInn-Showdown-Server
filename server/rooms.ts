@@ -2088,11 +2088,13 @@ export class GameRoom extends BasicRoom {
 			inputlog: battle.inputLog?.join('\n') || undefined,
 			password,
 		});
+		console.log(result)
 		if (result?.errorip) {
 			connection?.popup(`This server's request IP ${result.errorip} is not a registered server.`);
 			return;
 		}
-
+		
+		
 		const fullid = result?.replayid;
 		const url = `https://${Config.routes.replays}/${fullid}`;
 		connection?.popup(
