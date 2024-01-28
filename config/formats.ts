@@ -19,6 +19,14 @@ The column value will be ignored for repeat sections.
 
 export const Formats: FormatList = [
 
+	{ section: "BudewInn" },
+	{
+		name: "[Gen 9] Lega di Paldea!",
+		mod: 'gen9',
+		gameType: 'doubles',
+		ruleset: ['Team Preview', 'HP Percentage Mod', 'Cancel Mod', '!! Adjust Level = 50', 'Picked Team Size = 4'],
+	},
+
 	// S/V Singles
 	///////////////////////////////////////////////////////////////////
 
