@@ -24,7 +24,7 @@ export const Formats: FormatList = [
 		name: "[Gen 9] Lega di Paldea!",
 		mod: 'gen9',
 		gameType: 'doubles',
-		ruleset: ['Team Preview', 'HP Percentage Mod', 'Cancel Mod', '!! Adjust Level = 50', 'Picked Team Size = 4'],
+		ruleset: ['Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Adjust Level = 50', 'Picked Team Size = 4'],
 	},
 
 	// S/V Singles
