@@ -21,10 +21,15 @@ export const Formats: FormatList = [
 
 	{ section: "BudewInn" },
 	{
-		name: "[Gen 9] Lega di Paldea!",
+		name: "[Gen 9] Lega di Paldea! Singles",
+		mod: 'gen9',
+		ruleset: ["Obtainable Formes","Max Team Size = 6","Max Move Count = 4","EV Limit = Auto","Tera Type Preview", 'Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Adjust Level = 50']
+	},
+	{
+		name: "[Gen 9] Lega di Paldea! Doubles",
 		mod: 'gen9',
 		gameType: 'doubles',
-		ruleset: ["Obtainable", 'Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Adjust Level = 50', 'Picked Team Size = 4'],
+		ruleset: ["Obtainable Formes","Max Team Size = 6","Max Move Count = 4","EV Limit = Auto","Tera Type Preview", 'Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Adjust Level = 50', 'Picked Team Size = 4',"Best Of = 3"]
 	},
 
 	// S/V Singles
