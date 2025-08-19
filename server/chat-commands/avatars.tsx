@@ -6,7 +6,8 @@
  * @author Zarel <guangcongluo@gmail.com>
  */
 
-import {FS, Net} from "../../lib";
+import { FS, Net } from "../../lib";
+import { fetch } from "../../tools/set-import/importer";
 
 const AVATARS_FILE = 'config/avatars.json';
 
@@ -38,7 +39,7 @@ interface AvatarEntry {
 	default?: AvatarID | null;
 }
 
-const customAvatars: {[userid: string]: AvatarEntry} = Object.create(null);
+const customAvatars: { [userid: string]: AvatarEntry; } = Object.create(null);
 
 try {
 	const configAvatars = JSON.parse(FS(AVATARS_FILE).readSync());
@@ -46,13 +47,13 @@ try {
 } catch {
 	if (Config.customavatars) {
 		for (const userid in Config.customavatars) {
-			customAvatars[userid] = {allowed: [Config.customavatars[userid]]};
+			customAvatars[userid] = { allowed: [Config.customavatars[userid]] };
 		}
 	}
 	if (Config.allowedavatars) {
 		for (const avatar in Config.customavatars) {
 			for (const userid of Config.customavatars[avatar]) {
-				if (!customAvatars[userid]) customAvatars[userid] = {allowed: [null]};
+				if (!customAvatars[userid]) customAvatars[userid] = { allowed: [null] };
 				customAvatars[userid].allowed.push(avatar);
 			}
 		}
@@ -63,7 +64,7 @@ if ((Config.customavatars && Object.keys(Config.customavatars).length) || Config
 	Monitor.crashlog("Please remove 'customavatars' and 'allowedavatars' from Config (config/config.js). Your avatars have been migrated to the new '/addavatar' system.");
 }
 function saveCustomAvatars(instant?: boolean) {
-	FS(AVATARS_FILE).writeUpdate(() => JSON.stringify(customAvatars), {throttle: instant ? null : 60_000});
+	FS(AVATARS_FILE).writeUpdate(() => JSON.stringify(customAvatars), { throttle: instant ? null : 60_000 });
 }
 
 export const Avatars = new class {
@@ -109,7 +110,7 @@ export const Avatars = new class {
 		if (avatar.startsWith('#') && avatar.includes('.')) return avatar.slice(1);
 		return avatar;
 	}
-	async validate(avatar: string, options?: {rejectOfficial?: boolean}) {
+	async validate(avatar: string, options?: { rejectOfficial?: boolean; }) {
 		avatar = this.convert(avatar);
 		if (!/^#?[a-z0-9-]+$/.test(avatar) && !/^[a-z0-9.-]+$/.test(avatar)) {
 			throw new Chat.ErrorMessage(`Avatar "${avatar}" is not in a valid format. ${AVATAR_FORMATS_MESSAGE}`);
@@ -126,7 +127,7 @@ export const Avatars = new class {
 		const src = Avatars.src(avatar);
 		if (!src) return <strong><code>{avatar}</code></strong>;
 		return <img
-			src={src} alt={noAlt ? '' : avatar} width="80" height="80" class="pixelated" style={{verticalAlign: 'middle'}}
+			src={src} alt={noAlt ? '' : avatar} width="80" height="80" class="pixelated" style={{ verticalAlign: 'middle' }}
 		/>;
 	}
 	getDefault(userid: ID) {
@@ -141,7 +142,7 @@ export const Avatars = new class {
 	/** does not include validation */
 	setDefault(userid: ID, avatar: AvatarID | null) {
 		if (avatar === this.getDefault(userid)) return;
-		if (!customAvatars[userid]) customAvatars[userid] = {allowed: [null]};
+		if (!customAvatars[userid]) customAvatars[userid] = { allowed: [null] };
 		const entry = customAvatars[userid];
 
 		if (avatar === entry.allowed[0]) {
@@ -152,7 +153,7 @@ export const Avatars = new class {
 		saveCustomAvatars();
 	}
 	addAllowed(userid: ID, avatar: AvatarID | null) {
-		if (!customAvatars[userid]) customAvatars[userid] = {allowed: [null]};
+		if (!customAvatars[userid]) customAvatars[userid] = { allowed: [null] };
 
 		if (customAvatars[userid].allowed.includes(avatar)) return false;
 
@@ -174,7 +175,7 @@ export const Avatars = new class {
 		return true;
 	}
 	addPersonal(userid: ID, avatar: AvatarID | null) {
-		if (!customAvatars[userid]) customAvatars[userid] = {allowed: [null]};
+		if (!customAvatars[userid]) customAvatars[userid] = { allowed: [null] };
 		const entry = customAvatars[userid];
 
 		if (entry.allowed.includes(avatar)) return false;
@@ -655,6 +656,33 @@ const OFFICIAL_AVATARS_SELENA = new Set([
 	'kris',
 ]);
 
+//inizializzare OFFICIAL_AVATARS aggiungendo alla fine dell'inizializzazione vanilla un fetch ad un json con tutti gli avatar custom, 
+//il fetch verrà fatto al json che overseer aggiornerà quando sarà fatto il comando addavatar
+//poi verrà estratto l'array, e sarà trasformato in set, per poi venir aggiunto elemento per elemento ad OFFICIAL_AVATARS, come gli altri
+//dopo aver fatto il comando /sdlink uploadavatar (magari riesco ad automatizzarlo con overseer ma il comando serve comunque) partirà una funzione che ridichiara OFFICIAL_AVATARS, rileggiendo quindi il json e aggiornando di conseguenza tutto
+//l'avatar dovrà avere il nome dell'id di chi l'ha caricato+nome dell'avatar dichiarato nel comando
+//overseer:
+//il comando avrà 2 opzioni: fileavatar, nome avatar(autosostituzione degli spazi con -)   inutile dire che se il file è più grande di 80x80 allora non verrà caricato
+//una volta fatto il bot rispondera: richiesta inviata, ti avviserò quando sarà approvata o robe del genere
+//uscirà in un thread, che creo dopo, la richiesta con con i pulsanti sotto: approva e disapprova. il resto lo puoi immaginare, 
+
+fetch("https://api.budewinn.it/avatar")
+	.then(async response => {
+		for (const avatar of new Set(JSON.parse(response))) {
+			OFFICIAL_AVATARS.add(String(avatar));
+		}
+	})
+
+fetch("https://budewinn.it/avatars/gym.js")
+.then(async response => {
+	for (const avatar of new Set(JSON.parse(String(response.replace("exports.AvatarsGymList =",""))).gen9)) {
+		OFFICIAL_AVATARS.add(String(avatar));
+	}
+	for (const avatar of new Set(JSON.parse(String(response.replace("exports.AvatarsGymList =",""))).gen8)) {
+		OFFICIAL_AVATARS.add(String(avatar));
+	}
+});
+
 for (const avatar of OFFICIAL_AVATARS_BELIOT419) OFFICIAL_AVATARS.add(avatar);
 for (const avatar of OFFICIAL_AVATARS_GNOMOWLADNY) OFFICIAL_AVATARS.add(avatar);
 for (const avatar of OFFICIAL_AVATARS_BRUMIRAGE) OFFICIAL_AVATARS.add(avatar);
@@ -667,24 +695,37 @@ for (const avatar of OFFICIAL_AVATARS_HORO) OFFICIAL_AVATARS.add(avatar);
 for (const avatar of OFFICIAL_AVATARS_SELENA) OFFICIAL_AVATARS.add(avatar);
 
 export const commands: Chat.ChatCommands = {
-	avatar(target, room, user) {
+	async avatar(target, room, user) {
+
+
 		if (!target) return this.parse(`${this.cmdToken}avatars`);
 		const [maybeAvatar, silent] = target.split(',');
-		const avatar = Avatars.userCanUse(user, maybeAvatar);
+		var avatar = Avatars.userCanUse(user, maybeAvatar);
+
+		//console.log(avatar, maybeAvatar)
 
 		if (!avatar) {
-			if (silent) return false;
-			this.errorReply("Unrecognized avatar - make sure you're on the right account?");
-			return false;
-		}
+			const update = await fetch("https://api.budewinn.it/avatar");
 
+			for (const avatar of new Set(JSON.parse(update))) { 
+				OFFICIAL_AVATARS.add(String(avatar));			//funzione per aggiornare la cache di avatar
+			}
+
+			avatar = Avatars.userCanUse(user, maybeAvatar);
+
+			if (!avatar) {
+				if (silent) return false;
+				this.errorReply("Unrecognized avatar - make sure you're on the right account?");
+				return false;
+		}}
+		
 		user.avatar = avatar;
 		if (user.id in customAvatars && !avatar.endsWith('xmas')) {
 			Avatars.setDefault(user.id, avatar);
 		}
 		if (!silent) {
 			this.sendReply(
-				`${this.tr`Avatar changed to:`}\n` +
+				`${this.tr`Avatar cambiato in:`}\n` +
 				Chat.html`|raw|${Avatars.img(avatar)}`
 			);
 			if (OFFICIAL_AVATARS_BELIOT419.has(avatar)) {
@@ -746,7 +787,7 @@ export const commands: Chat.ChatCommands = {
 								{hasButton ?
 									<button name="send" value={`/avatar ${avatar}`} class="button">{Avatars.img(avatar!)}</button> :
 									Avatars.img(avatar!)
-								} {}
+								} { }
 								<code>/avatar {avatar!.replace('#', '')}</code>
 							</p>
 						))
@@ -763,13 +804,13 @@ export const commands: Chat.ChatCommands = {
 
 		this.sendReplyBox(<>
 			{!target && [<p>
-				You can <button name="avatars" class="button">change your avatar</button> by clicking on it in the {}
-				<button name="openOptions" class="button" aria-label="Options"><i class="fa fa-cog"></i></button> menu in the upper {}
+				You can <button name="avatars" class="button">change your avatar</button> by clicking on it in the { }
+				<button name="openOptions" class="button" aria-label="Options"><i class="fa fa-cog"></i></button> menu in the upper { }
 				right.
 			</p>, <p>
-				Avatars from generations other than 4-5 are hidden. You can find them in this {}
-				<a href="https://play.pokemonshowdown.com/sprites/trainers/"><strong>full list of avatars</strong></a>. {}
-				You can use them by typing <code>/avatar <i>[avatar's name]</i></code> into any chat. For example, {}
+				Avatars from generations other than 4-5 are hidden. You can find them in this { }
+				<a href="https://play.pokemonshowdown.com/sprites/trainers/"><strong>full list of avatars</strong></a>. { }
+				You can use them by typing <code>/avatar <i>[avatar's name]</i></code> into any chat. For example, { }
 				<code>/avatar erika-gen2</code>.
 			</p>]}
 			{out}
@@ -803,7 +844,7 @@ export const commands: Chat.ChatCommands = {
 			throw new Chat.ErrorMessage(`"${inputUsername}" is not a valid username.`);
 		}
 		const userid = toID(inputUsername);
-		const avatar = await Avatars.validate(inputAvatar, {rejectOfficial: true});
+		const avatar = await Avatars.validate(inputAvatar, { rejectOfficial: true });
 
 		if (!Avatars.addPersonal(userid, avatar)) {
 			throw new Chat.ErrorMessage(`User "${inputUsername}" can already use avatar "${avatar}".`);
@@ -826,7 +867,7 @@ export const commands: Chat.ChatCommands = {
 			throw new Chat.ErrorMessage(`"${inputUsername}" is not a valid username.`);
 		}
 		const userid = toID(inputUsername);
-		const avatar = await Avatars.validate(inputAvatar, {rejectOfficial: true});
+		const avatar = await Avatars.validate(inputAvatar, { rejectOfficial: true });
 
 		if (!Avatars.addAllowed(userid, avatar)) {
 			throw new Chat.ErrorMessage(`User "${inputUsername}" can already use avatar "${avatar}".`);
@@ -917,7 +958,7 @@ export const commands: Chat.ChatCommands = {
 			return this.errorReply(`That user has no avatars.`);
 		}
 		const existing = customAvatars[to]?.allowed.filter(Boolean);
-		customAvatars[to] = {...customAvatars[from]};
+		customAvatars[to] = { ...customAvatars[from] };
 		delete customAvatars[from];
 		if (existing) {
 			for (const avatar of existing) {

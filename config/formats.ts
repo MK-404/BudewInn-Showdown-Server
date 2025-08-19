@@ -32,6 +32,13 @@ export const Formats: FormatList = [
 		ruleset: ["Obtainable Formes","Max Team Size = 6","Max Move Count = 4","EV Limit = Auto","Tera Type Preview", 'Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Adjust Level = 50', 'Picked Team Size = 4',"Best Of = 3"]
 	},
 
+	{
+		name: "[Gen 9] Triples",
+		mod: 'gen9',
+		gameType: 'triples',
+		ruleset: ['Team Preview', 'Cancel Mod', 'Max Team Size = 24', 'Max Move Count = 24', 'Max Level = 9999', 'Default Level = 100'],
+	},
+
 	// S/V Singles
 	///////////////////////////////////////////////////////////////////
 

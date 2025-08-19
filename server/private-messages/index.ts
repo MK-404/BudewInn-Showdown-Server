@@ -58,6 +58,9 @@ export const PrivateMessages = new class {
 		to = toID(to);
 		const setting = await this.getSettings(to);
 		const requirement = setting?.view_only || Config.usesqlitepms || "friends";
+		console.log("requirement: "+ requirement)
+		console.log("from: "+ from)
+		console.log("to: "+ to)
 		switch (requirement) {
 		case 'friends':
 			if (!(await Chat.Friends.findFriendship(to, from))) {
@@ -154,9 +157,13 @@ export const PrivateMessages = new class {
 		return PM.run(statements.clearSeen);
 	}
 	send(message: string, user: User, pmTarget: User, onlyRecipient: User | null = null) {
+		
 		const buf = `|pm|${user.getIdentity()}|${pmTarget.getIdentity()}|${message}`;
 		if (onlyRecipient) return onlyRecipient.send(buf);
 		user.send(buf);
+		console.log(message)
+		console.log(buf)
+console.log(onlyRecipient)
 		if (pmTarget !== user) pmTarget.send(buf);
 		pmTarget.lastPM = user.id;
 		user.lastPM = pmTarget.id;

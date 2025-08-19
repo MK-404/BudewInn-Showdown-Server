@@ -17,7 +17,7 @@ var force = decl || ['--force', 'force', '--full', 'full'].includes(process.argv
 process.chdir(__dirname);
 
 function shell(cmd) {
-	child_process.execSync(cmd, {stdio: 'inherit'});
+	child_process.execSync(cmd, { stdio: 'inherit' });
 }
 
 // Check to make sure the most recently added or updated dependency is installed at the correct version

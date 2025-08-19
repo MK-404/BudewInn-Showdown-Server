@@ -1,4 +1,14 @@
-export const ItemsText: {[k: string]: ItemText} = {
+export const ItemsText: { [k: string]: ItemText } = {
+	lastrapresente: {
+		name: "Lastrapresente",
+		desc: "NOPE",
+		block: "NOPE",
+	},
+	lastracura: {
+		name: "Lastracura",
+		desc: "NOPE",
+		block: "NOPE",
+	},
 	abilityshield: {
 		name: "Ability Shield",
 		desc: "Holder's Ability cannot be changed by any effect.",
