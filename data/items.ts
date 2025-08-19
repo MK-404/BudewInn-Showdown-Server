@@ -1,4 +1,4 @@
-export const Items: { [itemid: string]: ItemData } = {
+export const Items: import('../sim/dex-items').ItemDataTable = {
 
 	lastrapresente: {
 		name: "Lastra Presente",
@@ -629,19 +629,18 @@ export const Items: { [itemid: string]: ItemData } = {
 	blueorb: {
 		name: "Blue Orb",
 		spritenum: 41,
+		onSwitchInPriority: -1,
 		onSwitchIn(pokemon) {
 			if (pokemon.isActive && pokemon.baseSpecies.name === 'Kyogre') {
 				this.queue.insertChoice({ choice: 'runPrimal', pokemon: pokemon });
 			}
-		},
-		onPrimal(pokemon) {
-			pokemon.formeChange('Kyogre-Primal', this.effect, true);
 		},
 		onTakeItem(item, source) {
 			if (source.baseSpecies.baseSpecies === 'Kyogre') return false;
 			return true;
 		},
 		itemUser: ["Kyogre"],
+		isPrimalOrb: true,
 		num: 535,
 		gen: 6,
 		isNonstandard: "Past",
@@ -675,12 +674,13 @@ export const Items: { [itemid: string]: ItemData } = {
 		fling: {
 			basePower: 30,
 		},
-		onStart() {
+		onSwitchInPriority: -2,
+		onStart(pokemon) {
 			this.effectState.started = true;
+			((this.effect as any).onUpdate as (p: Pokemon) => void).call(this, pokemon);
 		},
 		onUpdate(pokemon) {
 			if (!this.effectState.started || pokemon.transformed) return;
-			if (this.queue.peek(true)?.choice === 'runSwitch') return;
 
 			if (pokemon.hasAbility('protosynthesis') && !this.field.isWeather('sunnyday') && pokemon.useItem()) {
 				pokemon.addVolatile('protosynthesis');
@@ -983,7 +983,7 @@ export const Items: { [itemid: string]: ItemData } = {
 		},
 		onStart(pokemon) {
 			if (pokemon.volatiles['choicelock']) {
-				this.debug('removing choicelock: ' + pokemon.volatiles['choicelock']);
+				this.debug('removing choicelock');
 			}
 			pokemon.removeVolatile('choicelock');
 		},
@@ -1007,7 +1007,7 @@ export const Items: { [itemid: string]: ItemData } = {
 		},
 		onStart(pokemon) {
 			if (pokemon.volatiles['choicelock']) {
-				this.debug('removing choicelock: ' + pokemon.volatiles['choicelock']);
+				this.debug('removing choicelock');
 			}
 			pokemon.removeVolatile('choicelock');
 		},
@@ -1030,7 +1030,7 @@ export const Items: { [itemid: string]: ItemData } = {
 		},
 		onStart(pokemon) {
 			if (pokemon.volatiles['choicelock']) {
-				this.debug('removing choicelock: ' + pokemon.volatiles['choicelock']);
+				this.debug('removing choicelock');
 			}
 			pokemon.removeVolatile('choicelock');
 		},
@@ -1086,6 +1086,7 @@ export const Items: { [itemid: string]: ItemData } = {
 		fling: {
 			basePower: 30,
 		},
+		onTryBoostPriority: 1,
 		onTryBoost(boost, target, source, effect) {
 			if (source && target === source) return;
 			let showMsg = false;
@@ -1097,7 +1098,7 @@ export const Items: { [itemid: string]: ItemData } = {
 				}
 			}
 			if (showMsg && !(effect as ActiveMove).secondaries && effect.id !== 'octolock') {
-				this.add('-fail', target, 'unboost', '[from] item: Clear Amulet', '[of] ' + target);
+				this.add('-fail', target, 'unboost', '[from] item: Clear Amulet', `[of] ${target}`);
 			}
 		},
 		num: 1882,
@@ -1212,7 +1213,7 @@ export const Items: { [itemid: string]: ItemData } = {
 		},
 		onModifySecondaries(secondaries) {
 			this.debug('Covert Cloak prevent secondary');
-			return secondaries.filter(effect => !!(effect.self || effect.dustproof));
+			return secondaries.filter(effect => !!effect.self);
 		},
 		num: 1885,
 		gen: 9,
@@ -1364,7 +1365,7 @@ export const Items: { [itemid: string]: ItemData } = {
 		},
 		onAttractPriority: -100,
 		onAttract(target, source) {
-			this.debug('attract intercepted: ' + target + ' from ' + source);
+			this.debug(`attract intercepted: ${target} from ${source}`);
 			if (!source || source === target) return;
 			if (!source.volatiles['attract']) source.addVolatile('attract', target);
 		},
@@ -1631,25 +1632,47 @@ export const Items: { [itemid: string]: ItemData } = {
 		fling: {
 			basePower: 50,
 		},
-		onAfterBoost(boost, target, source, effect) {
-			if (this.activeMove?.id === 'partingshot') return;
-			let eject = false;
+		onAfterBoost(boost, pokemon) {
+			if (this.effectState.eject || this.activeMove?.id === 'partingshot') return;
 			let i: BoostID;
 			for (i in boost) {
 				if (boost[i]! < 0) {
-					eject = true;
+					this.effectState.eject = true;
+					break;
 				}
 			}
-			if (eject) {
-				if (target.hp) {
-					if (!this.canSwitch(target.side)) return;
-					if (target.volatiles['commanding'] || target.volatiles['commanded']) return;
-					for (const pokemon of this.getAllActive()) {
-						if (pokemon.switchFlag === true) return;
-					}
-					if (target.useItem()) target.switchFlag = true;
-				}
+		},
+		onAnySwitchInPriority: -4,
+		onAnySwitchIn() {
+			if (!this.effectState.eject) return;
+			(this.effectState.target as Pokemon).useItem();
+		},
+		onAnyAfterMega() {
+			if (!this.effectState.eject) return;
+			(this.effectState.target as Pokemon).useItem();
+		},
+		onAnyAfterMove() {
+			if (!this.effectState.eject) return;
+			(this.effectState.target as Pokemon).useItem();
+		},
+		onResidualOrder: 29,
+		onResidual(pokemon) {
+			if (!this.effectState.eject) return;
+			(this.effectState.target as Pokemon).useItem();
+		},
+		onUseItem(item, pokemon) {
+			if (!this.canSwitch(pokemon.side)) return false;
+			if (pokemon.volatiles['commanding'] || pokemon.volatiles['commanded']) return false;
+			for (const active of this.getAllActive()) {
+				if (active.switchFlag === true) return false;
 			}
+			return true;
+		},
+		onUse(pokemon) {
+			pokemon.switchFlag = true;
+		},
+		onEnd() {
+			delete this.effectState.eject;
 		},
 		num: 1119,
 		gen: 8,
@@ -1699,6 +1722,7 @@ export const Items: { [itemid: string]: ItemData } = {
 		fling: {
 			basePower: 10,
 		},
+		onSwitchInPriority: -1,
 		onStart(pokemon) {
 			if (!pokemon.ignoringItem() && this.field.isTerrain('electricterrain')) {
 				pokemon.useItem();
@@ -2184,7 +2208,6 @@ export const Items: { [itemid: string]: ItemData } = {
 		},
 		num: 1582,
 		gen: 8,
-		isNonstandard: "Unobtainable",
 	},
 	galaricawreath: {
 		name: "Galarica Wreath",
@@ -2194,7 +2217,6 @@ export const Items: { [itemid: string]: ItemData } = {
 		},
 		num: 1592,
 		gen: 8,
-		isNonstandard: "Unobtainable",
 	},
 	galladite: {
 		name: "Galladite",
@@ -2385,6 +2407,7 @@ export const Items: { [itemid: string]: ItemData } = {
 		fling: {
 			basePower: 10,
 		},
+		onSwitchInPriority: -1,
 		onStart(pokemon) {
 			if (!pokemon.ignoringItem() && this.field.isTerrain('grassyterrain')) {
 				pokemon.useItem();
@@ -3715,6 +3738,7 @@ export const Items: { [itemid: string]: ItemData } = {
 					pokemon.removeVolatile('metronome');
 					return;
 				}
+				if (move.callsMove) return;
 				if (this.effectState.lastMove === move.id && pokemon.moveLastTurnResult) {
 					this.effectState.numConsecutive++;
 				} else if (pokemon.volatiles['twoturnmove']) {
@@ -3863,19 +3887,44 @@ export const Items: { [itemid: string]: ItemData } = {
 		},
 		onFoeAfterBoost(boost, target, source, effect) {
 			if (effect?.name === 'Opportunist' || effect?.name === 'Mirror Herb') return;
-			const boostPlus: SparseBoostsTable = {};
-			let statsRaised = false;
+			if (!this.effectState.boosts) this.effectState.boosts = {} as SparseBoostsTable;
+			const boostPlus = this.effectState.boosts;
 			let i: BoostID;
 			for (i in boost) {
 				if (boost[i]! > 0) {
-					boostPlus[i] = boost[i];
-					statsRaised = true;
+					boostPlus[i] = (boostPlus[i] || 0) + boost[i]!;
+					this.effectState.ready = true;
 				}
 			}
-			if (!statsRaised) return;
-			const pokemon: Pokemon = this.effectState.target;
-			pokemon.useItem();
-			this.boost(boostPlus, pokemon);
+		},
+		onAnySwitchInPriority: -3,
+		onAnySwitchIn() {
+			if (!this.effectState.ready) return;
+			(this.effectState.target as Pokemon).useItem();
+		},
+		onAnyAfterMega() {
+			if (!this.effectState.ready) return;
+			(this.effectState.target as Pokemon).useItem();
+		},
+		onAnyAfterTerastallization() {
+			if (!this.effectState.ready) return;
+			(this.effectState.target as Pokemon).useItem();
+		},
+		onAnyAfterMove() {
+			if (!this.effectState.ready) return;
+			(this.effectState.target as Pokemon).useItem();
+		},
+		onResidualOrder: 29,
+		onResidual(pokemon) {
+			if (!this.effectState.ready) return;
+			(this.effectState.target as Pokemon).useItem();
+		},
+		onUse(pokemon) {
+			this.boost(this.effectState.boosts, pokemon);
+		},
+		onEnd() {
+			delete this.effectState.boosts;
+			delete this.effectState.ready;
 		},
 		num: 1883,
 		gen: 9,
@@ -3886,6 +3935,7 @@ export const Items: { [itemid: string]: ItemData } = {
 		fling: {
 			basePower: 10,
 		},
+		onSwitchInPriority: -1,
 		onStart(pokemon) {
 			if (!pokemon.ignoringItem() && this.field.isTerrain('mistyterrain')) {
 				pokemon.useItem();
@@ -4583,6 +4633,7 @@ export const Items: { [itemid: string]: ItemData } = {
 		fling: {
 			basePower: 10,
 		},
+		onSwitchInPriority: -1,
 		onStart(pokemon) {
 			if (!pokemon.ignoringItem() && this.field.isTerrain('psychicterrain')) {
 				pokemon.useItem();
@@ -4808,19 +4859,18 @@ export const Items: { [itemid: string]: ItemData } = {
 	redorb: {
 		name: "Red Orb",
 		spritenum: 390,
+		onSwitchInPriority: -1,
 		onSwitchIn(pokemon) {
 			if (pokemon.isActive && pokemon.baseSpecies.name === 'Groudon') {
 				this.queue.insertChoice({ choice: 'runPrimal', pokemon: pokemon });
 			}
-		},
-		onPrimal(pokemon) {
-			pokemon.formeChange('Groudon-Primal', this.effect, true);
 		},
 		onTakeItem(item, source) {
 			if (source.baseSpecies.baseSpecies === 'Groudon') return false;
 			return true;
 		},
 		itemUser: ["Groudon"],
+		isPrimalOrb: true,
 		num: 534,
 		gen: 6,
 		isNonstandard: "Past",
@@ -4954,6 +5004,7 @@ export const Items: { [itemid: string]: ItemData } = {
 		fling: {
 			basePower: 100,
 		},
+		onSwitchInPriority: -1,
 		onStart(pokemon) {
 			if (!pokemon.ignoringItem() && this.field.getPseudoWeather('trickroom')) {
 				pokemon.useItem();
@@ -5096,7 +5147,6 @@ export const Items: { [itemid: string]: ItemData } = {
 		num: 5,
 		gen: 1,
 		isPokeball: true,
-		isNonstandard: "Unobtainable",
 	},
 	safetygoggles: {
 		name: "Safety Goggles",
@@ -5253,7 +5303,11 @@ export const Items: { [itemid: string]: ItemData } = {
 		},
 		onTrapPokemonPriority: -10,
 		onTrapPokemon(pokemon) {
-			pokemon.trapped = pokemon.maybeTrapped = false;
+			pokemon.trapped = false;
+		},
+		onMaybeTrapPokemonPriority: -10,
+		onMaybeTrapPokemon(pokemon) {
+			pokemon.maybeTrapped = false;
 		},
 		num: 295,
 		gen: 4,
@@ -5574,7 +5628,6 @@ export const Items: { [itemid: string]: ItemData } = {
 		num: 499,
 		gen: 2,
 		isPokeball: true,
-		isNonstandard: "Unobtainable",
 	},
 	starfberry: {
 		name: "Starf Berry",
@@ -7233,20 +7286,36 @@ export const Items: { [itemid: string]: ItemData } = {
 				}
 			},
 		},
-		onUpdate(pokemon) {
-			let activate = false;
-			const boosts: SparseBoostsTable = {};
+		onStart(pokemon) {
+			this.effectState.boosts = {} as SparseBoostsTable;
+			let ready = false;
 			let i: BoostID;
 			for (i in pokemon.boosts) {
 				if (pokemon.boosts[i] < 0) {
-					activate = true;
-					boosts[i] = 0;
+					ready = true;
+					this.effectState.boosts[i] = 0;
 				}
 			}
-			if (activate && pokemon.useItem()) {
-				pokemon.setBoost(boosts);
-				this.add('-clearnegativeboost', pokemon, '[silent]');
-			}
+			if (ready) (this.effectState.target as Pokemon).useItem();
+			delete this.effectState.boosts;
+		},
+		onAnySwitchInPriority: -2,
+		onAnySwitchIn() {
+			((this.effect as any).onStart as (p: Pokemon) => void).call(this, this.effectState.target);
+		},
+		onAnyAfterMega() {
+			((this.effect as any).onStart as (p: Pokemon) => void).call(this, this.effectState.target);
+		},
+		onAnyAfterMove() {
+			((this.effect as any).onStart as (p: Pokemon) => void).call(this, this.effectState.target);
+		},
+		onResidualOrder: 29,
+		onResidual(pokemon) {
+			((this.effect as any).onStart as (p: Pokemon) => void).call(this, pokemon);
+		},
+		onUse(pokemon) {
+			pokemon.setBoost(this.effectState.boosts);
+			this.add('-clearnegativeboost', pokemon, '[silent]');
 		},
 		num: 214,
 		gen: 3,
@@ -7393,7 +7462,7 @@ export const Items: { [itemid: string]: ItemData } = {
 			basePower: 80,
 			type: "Poison",
 		},
-		onResidualOrder: 5,
+		onResidualOrder: 10,
 		onResidual(pokemon) {
 			if (pokemon.hp <= pokemon.maxhp / 2) {
 				pokemon.eatItem();
@@ -7459,7 +7528,7 @@ export const Items: { [itemid: string]: ItemData } = {
 			basePower: 80,
 			type: "Psychic",
 		},
-		onResidualOrder: 5,
+		onResidualOrder: 10,
 		onResidual(pokemon) {
 			if (pokemon.hp <= pokemon.maxhp / 2) {
 				pokemon.eatItem();

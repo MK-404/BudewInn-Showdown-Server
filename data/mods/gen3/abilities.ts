@@ -1,4 +1,4 @@
-export const Abilities: {[k: string]: ModdedAbilityData} = {
+export const Abilities: import('../../../sim/dex-abilities').ModdedAbilityDataTable = {
 	cutecharm: {
 		inherit: true,
 		onDamagingHit(damage, target, source, move) {
@@ -55,6 +55,15 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 		inherit: true,
 		flags: {},
 	},
+	hustle: {
+		inherit: true,
+		onSourceModifyAccuracy(accuracy, target, source, move) {
+			const physicalTypes = ['Normal', 'Fighting', 'Flying', 'Poison', 'Ground', 'Rock', 'Bug', 'Ghost', 'Steel'];
+			if (physicalTypes.includes(move.type) && typeof accuracy === 'number') {
+				return this.chainModify([3277, 4096]);
+			}
+		},
+	},
 	intimidate: {
 		inherit: true,
 		onStart(pokemon) {
@@ -76,22 +85,40 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 				if (target.volatiles['substitute']) {
 					this.add('-immune', target);
 				} else {
-					this.boost({atk: -1}, target, pokemon, null, true);
+					this.boost({ atk: -1 }, target, pokemon, null, true);
 				}
 			}
 		},
 	},
 	lightningrod: {
 		onFoeRedirectTarget(target, source, source2, move) {
-			if (move.type !== 'Electric') return;
+			// don't count Hidden Power as Electric-type
+			if (this.dex.moves.get(move.id).type !== 'Electric') return;
 			if (this.validTarget(this.effectState.target, source, move.target)) {
 				return this.effectState.target;
 			}
 		},
-		flags: {breakable: 1},
+		flags: { breakable: 1 },
 		name: "Lightning Rod",
 		rating: 0,
 		num: 32,
+	},
+	magnetpull: {
+		inherit: true,
+		onFoeTrapPokemon() {},
+		onFoeMaybeTrapPokemon() {},
+		onAnyTrapPokemon(pokemon) {
+			if (pokemon.hasType('Steel') && pokemon.isAdjacent(this.effectState.target)) {
+				pokemon.tryTrap(true);
+			}
+		},
+		onAnyMaybeTrapPokemon(pokemon, source) {
+			if (!source) source = this.effectState.target;
+			if (!source || !pokemon.isAdjacent(source)) return;
+			if (!pokemon.knownType || pokemon.hasType('Steel')) {
+				pokemon.maybeTrapped = true;
+			}
+		},
 	},
 	minus: {
 		inherit: true,
@@ -166,14 +193,12 @@ export const Abilities: {[k: string]: ModdedAbilityData} = {
 	},
 	trace: {
 		inherit: true,
-		onUpdate(pokemon) {
-			if (!pokemon.isStarted) return;
+		onUpdate() {},
+		onStart(pokemon) {
 			const target = pokemon.side.randomFoe();
 			if (!target || target.fainted) return;
 			const ability = target.getAbility();
-			if (pokemon.setAbility(ability)) {
-				this.add('-ability', pokemon, ability, '[from] ability: Trace', '[of] ' + target);
-			}
+			pokemon.setAbility(ability, target);
 		},
 		flags: {},
 	},

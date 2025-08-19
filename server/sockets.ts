@@ -15,9 +15,10 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
 import * as path from 'path';
-import {crashlogger, ProcessManager, Streams, Repl} from '../lib';
-import {IPTools} from './ip-tools';
-import {ChannelID, extractChannelMessages} from '../sim/battle';
+import { crashlogger, ProcessManager, Streams, Repl } from '../lib';
+import { IPTools } from './ip-tools';
+import { type ChannelID, extractChannelMessages } from '../sim/battle';
+import { StaticServer } from '../lib/static-server';
 
 type StreamWorker = ProcessManager.StreamWorker;
 
@@ -59,7 +60,7 @@ export const Sockets = new class {
 			}
 		}
 	}
-	onUnspawn(worker: StreamWorker) {
+	onUnspawn(this: void, worker: StreamWorker) {
 		Users.socketDisconnectAll(worker, worker.workerid);
 	}
 
@@ -83,11 +84,9 @@ export const Sockets = new class {
 		if (port !== undefined) {
 			Config.port = port;
 		}
-		if (workerCount === undefined) {
-			workerCount = (Config.workers !== undefined ? Config.workers : 1);
-		}
+		workerCount ??= (Config.subprocessescache?.network ?? 1);
 
-		PM.env = {PSPORT: Config.port, PSBINDADDR: Config.bindaddress || '0.0.0.0', PSNOSSL: Config.ssl ? 0 : 1};
+		PM.env = { PSPORT: Config.port, PSBINDADDR: Config.bindaddress || '0.0.0.0', PSNOSSL: Config.ssl ? 0 : 1 };
 		PM.subscribeSpawn(worker => void this.onSpawn(worker));
 		PM.subscribeUnspawn(this.onUnspawn);
 
@@ -145,7 +144,7 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 
 	isTrustedProxyIp: (ip: string) => boolean;
 
-	receivers: {[k: string]: (this: ServerStream, data: string) => void} = {
+	receivers: { [k: string]: (this: ServerStream, data: string) => void } = {
 		'$'(data) {
 			// $code
 			// eslint-disable-next-line no-eval
@@ -259,7 +258,7 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 			for (const [curSocketid, curSocket] of room) {
 				const channelid = roomChannel?.get(curSocketid) || 0;
 				if (!messages[channelid]) messages[channelid] = channelMessages[channelid].join('\n');
-				curSocket.write(messages[channelid]!);
+				curSocket.write(messages[channelid]);
 			}
 		},
 	};
@@ -271,7 +270,6 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 		wsdeflate?: typeof Config.wsdeflate,
 		proxyip?: typeof Config.proxyip,
 		customhttpresponse?: typeof Config.customhttpresponse,
-		disablenodestatic?: boolean,
 	}) {
 		super();
 		if (!config.bindaddress) config.bindaddress = '0.0.0.0';
@@ -317,7 +315,7 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 						`Socket process ${process.pid}`
 					);
 				}
-			} catch (e: any) {
+			} catch {
 				console.warn('SSL certificate config values will not support HTTPS server option values in the future. Please set it to use the absolute path of its PEM file.');
 				cert = config.ssl.options.cert;
 			}
@@ -325,7 +323,7 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 			if (key && cert) {
 				try {
 					// In case there are additional SSL config settings besides the key and cert...
-					this.serverSsl = https.createServer({...config.ssl.options, key, cert});
+					this.serverSsl = https.createServer({ ...config.ssl.options, key, cert });
 				} catch (e: any) {
 					crashlogger(new Error(`The SSL settings are misconfigured:\n${e.stack}`), `Socket process ${process.pid}`);
 				}
@@ -334,8 +332,6 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 
 		// Static server
 		try {
-			if (config.disablenodestatic) throw new Error("disablenodestatic");
-			const StaticServer: typeof import('node-static').Server = require('node-static').Server;
 			const roomidRegex = /^\/(?:[A-Za-z0-9][A-Za-z0-9-]*)\/?$/;
 			const cssServer = new StaticServer('./config');
 			const avatarServer = new StaticServer('./config/avatars');
@@ -344,26 +340,26 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 				// console.log(`static rq: ${req.socket.remoteAddress}:${req.socket.remotePort} -> ${req.socket.localAddress}:${req.socket.localPort} - ${req.method} ${req.url} ${req.httpVersion} - ${req.rawHeaders.join('|')}`);
 				req.resume();
 				req.addListener('end', () => {
-					if (config.customhttpresponse &&
-							config.customhttpresponse(req, res)) {
+					if (config.customhttpresponse?.(req, res)) {
 						return;
 					}
 
 					let server = staticServer;
 					if (req.url) {
-						if (req.url === '/custom.css') {
+						if (req.url === '/custom.css' || req.url.startsWith('/custom.css?')) {
 							server = cssServer;
 						} else if (req.url.startsWith('/avatars/')) {
-							req.url = req.url.substr(8);
+							req.url = req.url.slice(8);
 							server = avatarServer;
 						} else if (roomidRegex.test(req.url)) {
 							req.url = '/';
 						}
 					}
 
-					server.serve(req, res, e => {
-						if (e && (e as any).status === 404) {
-							staticServer.serveFile('404.html', 404, {}, req, res);
+					void server.serve(req, res, e => {
+						if (e.status === 404) {
+							void staticServer.serveFile('404.html', 404, {}, req, res);
+							return true;
 						}
 					});
 				});
@@ -371,12 +367,8 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 
 			this.server.on('request', staticRequestHandler);
 			if (this.serverSsl) this.serverSsl.on('request', staticRequestHandler);
-		} catch (e: any) {
-			if (e.message === 'disablenodestatic') {
-				console.log('node-static is disabled');
-			} else {
-				console.log('Could not start node-static - try `npm install` if you want to use it');
-			}
+		} catch {
+			console.log('Could not start static server');
 		}
 
 		// SockJS server
@@ -385,7 +377,7 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 		// and doing things on our server.
 
 		const sockjs: typeof import('sockjs') = (require as any)('sockjs');
-		const options: import('sockjs').ServerOptions & {faye_server_options?: {[key: string]: any}} = {
+		const options: import('sockjs').ServerOptions & { faye_server_options?: { [key: string]: any } } = {
 			sockjs_url: `//play.pokemonshowdown.com/js/lib/sockjs-1.4.0-nwjsfix.min.js`,
 			prefix: '/showdown',
 			log(severity: string, message: string) {
@@ -396,7 +388,7 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 		if (config.wsdeflate !== null) {
 			try {
 				const deflate = (require as any)('permessage-deflate').configure(config.wsdeflate);
-				options.faye_server_options = {extensions: [deflate]};
+				options.faye_server_options = { extensions: [deflate] };
 			} catch {
 				crashlogger(
 					new Error("Dependency permessage-deflate is not installed or is otherwise unaccessable. No message compression will take place until server restart."),
@@ -418,9 +410,9 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 
 		if (this.serverSsl) {
 			server.installHandlers(this.serverSsl, {});
-			// @ts-ignore - if appssl exists, then `config.ssl` must also exist
+			// @ts-expect-error if appssl exists, then `config.ssl` must also exist
 			this.serverSsl.listen(config.ssl.port, config.bindaddress);
-			// @ts-ignore - if appssl exists, then `config.ssl` must also exist
+			// @ts-expect-error if appssl exists, then `config.ssl` must also exist
 			console.log(`Worker ${PM.workerid} now listening for SSL on port ${config.ssl.port}`);
 		}
 
@@ -463,7 +455,7 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 			return;
 		}
 
-		const socketid = '' + (++this.socketCounter);
+		const socketid = `${++this.socketCounter}`;
 		this.sockets.set(socketid, socket);
 
 		let socketip = socket.remoteAddress;
@@ -506,7 +498,7 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 		});
 	}
 
-	_write(data: string) {
+	override _write(data: string) {
 		// console.log('worker received: ' + data);
 
 		const receiver = this.receivers[data.charAt(0)];

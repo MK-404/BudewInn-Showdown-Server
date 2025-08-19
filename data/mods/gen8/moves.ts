@@ -1,14 +1,8 @@
-export const Moves: {[k: string]: ModdedMoveData} = {
+export const Moves: import('../../../sim/dex-moves').ModdedMoveDataTable = {
 	allyswitch: {
 		inherit: true,
-		stallingMove: false,
+		// Prevents setting the volatile used to check for Ally Switch failure
 		onPrepareHit() {},
-		onHit(pokemon) {
-			const newPosition = (pokemon.position === 0 ? pokemon.side.active.length - 1 : 0);
-			if (!pokemon.side.active[newPosition]) return false;
-			if (pokemon.side.active[newPosition].fainted) return false;
-			this.swapPosition(pokemon, newPosition, '[from] move: Ally Switch');
-		},
 	},
 	anchorshot: {
 		inherit: true,
@@ -20,7 +14,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	},
 	assist: {
 		inherit: true,
-		flags: {failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1},
+		flags: { failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1 },
 	},
 	auroraveil: {
 		inherit: true,
@@ -38,7 +32,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	},
 	belch: {
 		inherit: true,
-		flags: {protect: 1, failmefirst: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1},
+		flags: { protect: 1, failmefirst: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1 },
 	},
 	blizzard: {
 		inherit: true,
@@ -60,7 +54,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	},
 	celebrate: {
 		inherit: true,
-		flags: {nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1},
+		flags: { nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1 },
 	},
 	charge: {
 		inherit: true,
@@ -97,12 +91,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		inherit: true,
 		flags: {
 			protect: 1, mirror: 1, sound: 1, distance: 1, bypasssub: 1,
-			noassist: 1, failcopycat: 1, failinstruct: 1, failmefirst: 1, nosleeptalk: 1, failmimic: 1,
+			noassist: 1, failcopycat: 1, failinstruct: 1, failmefirst: 1, nosleeptalk: 1, failmimic: 1, nosketch: 1,
 		},
 	},
 	copycat: {
 		inherit: true,
-		flags: {failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1},
+		flags: { failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1 },
 	},
 	coreenforcer: {
 		inherit: true,
@@ -120,7 +114,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 		inherit: true,
 		onModifyMove(move, source, target) {
 			if (!source.hasType('Ghost')) {
-				move.target = move.nonGhostTarget as MoveTarget;
+				move.target = move.nonGhostTarget!;
 			}
 		},
 		target: "randomNormal",
@@ -132,7 +126,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	darkvoid: {
 		inherit: true,
 		isNonstandard: "Past",
-		noSketch: false,
+		flags: { protect: 1, reflectable: 1, mirror: 1, metronome: 1 },
 	},
 	doubleironbash: {
 		inherit: true,
@@ -140,7 +134,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	},
 	dragonhammer: {
 		inherit: true,
-		flags: {contact: 1, protect: 1, mirror: 1},
+		flags: { contact: 1, protect: 1, mirror: 1 },
 	},
 	dualchop: {
 		inherit: true,
@@ -152,7 +146,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	},
 	eternabeam: {
 		inherit: true,
-		flags: {recharge: 1, protect: 1, mirror: 1, failinstruct: 1},
+		flags: { recharge: 1, protect: 1, mirror: 1, failinstruct: 1 },
 		isNonstandard: null,
 	},
 	fishiousrend: {
@@ -190,7 +184,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	},
 	futuresight: {
 		inherit: true,
-		flags: {metronome: 1, futuremove: 1},
+		flags: { metronome: 1, futuremove: 1 },
 	},
 	geargrind: {
 		inherit: true,
@@ -235,12 +229,12 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	holdhands: {
 		inherit: true,
 		isNonstandard: null,
-		flags: {bypasssub: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1},
+		flags: { bypasssub: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1 },
 	},
 	hyperspacefury: {
 		inherit: true,
 		isNonstandard: "Past",
-		noSketch: false,
+		flags: { mirror: 1, bypasssub: 1 },
 	},
 	hyperspacehole: {
 		inherit: true,
@@ -378,7 +372,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	},
 	metronome: {
 		inherit: true,
-		flags: {failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1},
+		flags: { failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1 },
 	},
 	milkdrink: {
 		inherit: true,
@@ -394,11 +388,11 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	},
 	mirrorcoat: {
 		inherit: true,
-		flags: {protect: 1, failmefirst: 1, noassist: 1, failcopycat: 1},
+		flags: { protect: 1, failmefirst: 1, noassist: 1, failcopycat: 1 },
 	},
 	mirrormove: {
 		inherit: true,
-		flags: {failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1},
+		flags: { failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1 },
 	},
 	mistball: {
 		inherit: true,
@@ -411,7 +405,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	naturepower: {
 		inherit: true,
 		isNonstandard: null,
-		flags: {failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1},
+		flags: { failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1 },
 	},
 	naturesmadness: {
 		inherit: true,
@@ -515,7 +509,7 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	},
 	sleeptalk: {
 		inherit: true,
-		flags: {failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1},
+		flags: { failencore: 1, nosleeptalk: 1, noassist: 1, failcopycat: 1, failinstruct: 1 },
 	},
 	snaptrap: {
 		inherit: true,
@@ -528,6 +522,19 @@ export const Moves: {[k: string]: ModdedMoveData} = {
 	spectralthief: {
 		inherit: true,
 		isNonstandard: null,
+	},
+	stickyweb: {
+		inherit: true,
+		condition: {
+			onSideStart(side) {
+				this.add('-sidestart', side, 'move: Sticky Web');
+			},
+			onSwitchIn(pokemon) {
+				if (!pokemon.isGrounded() || pokemon.hasItem('heavydutyboots')) return;
+				this.add('-activate', pokemon, 'move: Sticky Web');
+				this.boost({ spe: -1 }, pokemon, this.effectState.source, this.dex.getActiveMove('stickyweb'));
+			},
+		},
 	},
 	stormthrow: {
 		inherit: true,
