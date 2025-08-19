@@ -794,335 +794,336 @@ export const commands: Chat.ChatCommands = {
 					this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://www.smogon.com/forums/members/455774/">RADU</a>)`);
 				}
 			}
-		},
-		avatarhelp: [
-			`/avatar [avatar name or number] - Change your trainer sprite.`,
-			`!avatar [avatar name or number] - Show the specified trainer sprite and credits. Requires: + % @ # ~`,
-		],
+		}
+	},
+	avatarhelp: [
+		`/avatar [avatar name or number] - Change your trainer sprite.`,
+		`!avatar [avatar name or number] - Show the specified trainer sprite and credits. Requires: + % @ # ~`,
+	],
 
-			avatars(target, room, user) {
-			this.runBroadcast();
+	avatars(target, room, user) {
+		this.runBroadcast();
 
-			if (target.startsWith('#')) return this.parse(`/avatarusers ${target}`);
+		if (target.startsWith('#')) return this.parse(`/avatarusers ${target}`);
 
-			const targetUser = this.broadcasting && !target ? null : this.getUserOrSelf(target);
-			const targetUserids = targetUser ? new Set([targetUser.id, ...targetUser.previousIDs]) :
-				target ? new Set([toID(target)]) : null;
-			if (targetUserids && targetUser !== user && !user.can('alts')) {
-				throw new Chat.ErrorMessage("You don't have permission to look at another user's avatars!");
-			}
+		const targetUser = this.broadcasting && !target ? null : this.getUserOrSelf(target);
+		const targetUserids = targetUser ? new Set([targetUser.id, ...targetUser.previousIDs]) :
+			target ? new Set([toID(target)]) : null;
+		if (targetUserids && targetUser !== user && !user.can('alts')) {
+			throw new Chat.ErrorMessage("You don't have permission to look at another user's avatars!");
+		}
 
-			const out = [];
-			if (targetUserids) {
-				const hasButton = !this.broadcasting && targetUser === user;
-				for (const id of targetUserids) {
-					const allowed = customAvatars[id]?.allowed;
-					if (allowed) {
-						out.push(
-							<p>Custom avatars from account <strong>{id}</strong>:</p>,
-							allowed.filter(Boolean).map(avatar => (
-								<p>
-									{hasButton ? (
-										<button name="send" value={`/avatar ${avatar}`} class="button">{Avatars.img(avatar!)}</button>
-									) : (
-										Avatars.img(avatar!)
-									)} { }
-									<code>/avatar {avatar!.replace('#', '')}</code>
-								</p>
-							))
-						);
-					}
-				}
-				if (!out.length && target) {
-					out.push(<p>User <strong>{toID(target)}</strong> doesn't have any custom avatars.</p>);
+		const out = [];
+		if (targetUserids) {
+			const hasButton = !this.broadcasting && targetUser === user;
+			for (const id of targetUserids) {
+				const allowed = customAvatars[id]?.allowed;
+				if (allowed) {
+					out.push(
+						<p>Custom avatars from account <strong>{id}</strong>:</p>,
+						allowed.filter(Boolean).map(avatar => (
+							<p>
+								{hasButton ? (
+									<button name="send" value={`/avatar ${avatar}`} class="button">{Avatars.img(avatar!)}</button>
+								) : (
+									Avatars.img(avatar!)
+								)} { }
+								<code>/avatar {avatar!.replace('#', '')}</code>
+							</p>
+						))
+					);
 				}
 			}
-			if (!out.length) {
-				out.push(<p>Custom avatars require you to be a contributor/staff or win a tournament prize.</p>);
+			if (!out.length && target) {
+				out.push(<p>User <strong>{toID(target)}</strong> doesn't have any custom avatars.</p>);
 			}
+		}
+		if (!out.length) {
+			out.push(<p>Custom avatars require you to be a contributor/staff or win a tournament prize.</p>);
+		}
 
-			this.sendReplyBox(<>
-				{!target && [<p>
-					You can <button name="avatars" class="button">change your avatar</button> by clicking on it in the { }
-					<button name="openOptions" class="button" aria-label="Options"><i class="fa fa-cog"></i></button> menu in the upper { }
-					right.
-				</p>, <p>
-					Avatars from generations other than 4-5 are hidden. You can find them in this { }
-					<a href="https://play.pokemonshowdown.com/sprites/trainers/"><strong>full list of avatars</strong></a>. { }
-					You can use them by typing <code>/avatar <i>[avatar's name]</i></code> into any chat. For example, { }
-					<code>/avatar erika-gen2</code>.
-				</p>]}
-				{out}
-			</>);
-		},
-		avatarshelp: [
-			`/avatars - Explains how to change avatars.`,
-			`/avatars [username] - Shows custom avatars available to a user.`,
-			`!avatars - Show everyone that information. Requires: + % @ # ~`,
-		],
+		this.sendReplyBox(<>
+			{!target && [<p>
+				You can <button name="avatars" class="button">change your avatar</button> by clicking on it in the { }
+				<button name="openOptions" class="button" aria-label="Options"><i class="fa fa-cog"></i></button> menu in the upper { }
+				right.
+			</p>, <p>
+				Avatars from generations other than 4-5 are hidden. You can find them in this { }
+				<a href="https://play.pokemonshowdown.com/sprites/trainers/"><strong>full list of avatars</strong></a>. { }
+				You can use them by typing <code>/avatar <i>[avatar's name]</i></code> into any chat. For example, { }
+				<code>/avatar erika-gen2</code>.
+			</p>]}
+			{out}
+		</>);
+	},
+	avatarshelp: [
+		`/avatars - Explains how to change avatars.`,
+		`/avatars [username] - Shows custom avatars available to a user.`,
+		`!avatars - Show everyone that information. Requires: + % @ # ~`,
+	],
 
-			addavatar() {
-			this.sendReply("Is this a personal avatar or a group avatar?");
-			return this.parse(`/help addavatar`);
-		},
-		addavatarhelp: [
-			`/personalavatar [username], [avatar] - Gives a user a default (personal) avatar.`,
-			`/groupavatar [username], [avatar] - Gives a user an allowed (group) avatar.`,
-			`/removeavatar [username], [avatar] - Removes access to an avatar from a user.`,
-			`/removeavatar [username] - Removes access to all custom avatars from a user.`,
-			`/moveavatars [oldname], [newname] - Moves access to all custom avatars from oldname to newname.`,
-			AVATAR_FORMATS_MESSAGE,
-		],
+	addavatar() {
+		this.sendReply("Is this a personal avatar or a group avatar?");
+		return this.parse(`/help addavatar`);
+	},
+	addavatarhelp: [
+		`/personalavatar [username], [avatar] - Gives a user a default (personal) avatar.`,
+		`/groupavatar [username], [avatar] - Gives a user an allowed (group) avatar.`,
+		`/removeavatar [username], [avatar] - Removes access to an avatar from a user.`,
+		`/removeavatar [username] - Removes access to all custom avatars from a user.`,
+		`/moveavatars [oldname], [newname] - Moves access to all custom avatars from oldname to newname.`,
+		AVATAR_FORMATS_MESSAGE,
+	],
 
-			personalavatar: 'defaultavatar',
-				async defaultavatar(target, room, user) {
-			this.checkCan('bypassall');
-			if (!target) return this.parse(`/help defaultavatar`);
-			const [inputUsername, inputAvatar] = this.splitOne(target);
-			if (!Users.isUsername(inputUsername)) {
-				throw new Chat.ErrorMessage(`"${inputUsername}" is not a valid username.`);
+	personalavatar: 'defaultavatar',
+	async defaultavatar(target, room, user) {
+		this.checkCan('bypassall');
+		if (!target) return this.parse(`/help defaultavatar`);
+		const [inputUsername, inputAvatar] = this.splitOne(target);
+		if (!Users.isUsername(inputUsername)) {
+			throw new Chat.ErrorMessage(`"${inputUsername}" is not a valid username.`);
+		}
+		const userid = toID(inputUsername);
+		const avatar = await Avatars.validate(inputAvatar, { rejectOfficial: true });
+
+		if (!Avatars.addPersonal(userid, avatar)) {
+			throw new Chat.ErrorMessage(`User "${inputUsername}" can already use avatar "${avatar}".`);
+		}
+		this.globalModlog('PERSONAL AVATAR', userid, avatar);
+		this.sendReplyBox(<div>
+			{Avatars.img(avatar)}<br />
+			Added to <username class="username">{inputUsername}</username>
+		</div>);
+	},
+	defaultavatarhelp: 'addavatarhelp',
+
+	allowedavatar: 'allowavatar',
+	groupavatar: 'allowavatar',
+	async allowavatar(target, room, user) {
+		this.checkCan('bypassall');
+		if (!target) return this.parse(`/help defaultavatar`);
+		const [inputUsername, inputAvatar] = this.splitOne(target);
+		if (!Users.isUsername(inputUsername)) {
+			throw new Chat.ErrorMessage(`"${inputUsername}" is not a valid username.`);
+		}
+		const userid = toID(inputUsername);
+		const avatar = await Avatars.validate(inputAvatar, { rejectOfficial: true });
+
+		if (!Avatars.addAllowed(userid, avatar)) {
+			throw new Chat.ErrorMessage(`User "${inputUsername}" can already use avatar "${avatar}".`);
+		}
+		this.globalModlog('GROUP AVATAR', userid, avatar);
+		this.sendReplyBox(<div>
+			{Avatars.img(avatar)}<br />
+			Added to <username class="username">{inputUsername}</username>
+		</div>);
+	},
+	allowavatarhelp: 'addavatarhelp',
+
+	denyavatar: 'removeavatar',
+	disallowavatar: 'removeavatar',
+	removeavatars: 'removeavatar',
+	removeavatar(target, room, user) {
+		this.checkCan('bypassall');
+		if (!target) return this.parse(`/help defaultavatar`);
+		const [inputUsername, inputAvatar] = this.splitOne(target);
+		if (!Users.isUsername(inputUsername)) {
+			throw new Chat.ErrorMessage(`"${inputUsername}" is not a valid username.`);
+		}
+		const userid = toID(inputUsername);
+		const avatar = Avatars.convert(inputAvatar);
+
+		const allowed = customAvatars[userid]?.allowed.filter(Boolean);
+		if (!allowed) {
+			throw new Chat.ErrorMessage(`${inputUsername} doesn't have any custom avatars.`);
+		}
+		if (avatar) {
+			if (!Avatars.removeAllowed(userid, avatar)) {
+				throw new Chat.ErrorMessage(`${inputUsername} doesn't have access to avatar "${avatar}"`);
 			}
-			const userid = toID(inputUsername);
-			const avatar = await Avatars.validate(inputAvatar, { rejectOfficial: true });
+			this.globalModlog('REMOVE AVATAR', userid, avatar);
+			this.sendReplyBox(<div>
+				{Avatars.img(avatar)}<br />
+				Removed from <username class="username">{inputUsername}</username>
+			</div>);
+		} else {
+			// delete all
+			delete customAvatars[userid];
+			Avatars.save();
+			this.globalModlog('REMOVE AVATARS', userid, allowed.join(','));
+			this.sendReplyBox(<div>
+				{allowed.map(curAvatar => [Avatars.img(curAvatar!), ' '])}<br />
+				Removed from <username class="username">{inputUsername}</username>
+			</div>);
+		}
+	},
+	removeavatarhelp: 'addavatarhelp',
 
-			if (!Avatars.addPersonal(userid, avatar)) {
-				throw new Chat.ErrorMessage(`User "${inputUsername}" can already use avatar "${avatar}".`);
+	async avatarusers(target, room, user) {
+		target = '#' + toID(target);
+		if (!Avatars.userCanUse(user, target) && !user.can('alts')) {
+			throw new Chat.ErrorMessage(`You don't have access to avatar "${target}"`);
+		}
+
+		this.runBroadcast();
+
+		const users = [];
+		for (const userid in customAvatars) {
+			if (customAvatars[userid].allowed.includes(target)) {
+				users.push(userid);
 			}
+		}
+		users.sort();
+
+		if (!users.length && !await Avatars.exists(target)) {
+			throw new Chat.ErrorMessage(`Unrecognized avatar "${target}"`);
+		}
+
+		this.sendReplyBox(<>
+			<p>{Avatars.img(target, true)}</p>
+			<p>
+				<code>{target}</code><br />
+				{users ? listUsers(users) : <p>No users currently allowed to use this avatar</p>}
+			</p>
+		</>);
+	},
+
+	moveavatars(target, room, user) {
+		this.checkCan('bypassall');
+		const [from, to] = target.split(',').map(toID);
+		if (!from || !to) {
+			return this.parse(`/help moveavatars`);
+		}
+		if (!customAvatars[from]?.allowed.length) {
+			throw new Chat.ErrorMessage(`That user has no avatars.`);
+		}
+		const existing = customAvatars[to]?.allowed.filter(Boolean);
+		customAvatars[to] = { ...customAvatars[from] };
+		delete customAvatars[from];
+		if (existing) {
+			for (const avatar of existing) {
+				if (!customAvatars[to].allowed.includes(avatar)) {
+					customAvatars[to].allowed.push(avatar);
+				}
+			}
+		}
+		Avatars.save(true);
+		this.sendReply(`Moved ${from}'s avatars to '${to}'.`);
+		this.globalModlog(`MOVEAVATARS`, to, `from ${from}`);
+		Avatars.tryNotify(Users.get(to));
+	},
+	moveavatarshelp: [
+		`/moveavatars [from user], [to user] - Move all of the custom avatars from [from user] to [to user]. Requires: ~`,
+	],
+
+	async masspavatar(target, room, user) {
+		this.checkCan('bypassall');
+
+		const usernames = target.trim().split(/\s*\n|,\s*/)
+			.map(username => username.endsWith('.png') ? username.slice(0, -4) : username);
+		for (const username of usernames) {
+			if (!Users.isUsername(username)) {
+				throw new Chat.ErrorMessage(`Invalid username "${username}"`);
+			}
+			await Avatars.validate('#' + toID(username));
+		}
+
+		const userids = usernames.map(toID);
+		for (const userid of userids) {
+			const avatar = '#' + userid;
+			Avatars.addPersonal(userid, avatar);
 			this.globalModlog('PERSONAL AVATAR', userid, avatar);
-			this.sendReplyBox(<div>
-				{Avatars.img(avatar)}<br />
-				Added to <username class="username">{inputUsername}</username>
-			</div>);
-		},
-		defaultavatarhelp: 'addavatarhelp',
-
-			allowedavatar: 'allowavatar',
-				groupavatar: 'allowavatar',
-					async allowavatar(target, room, user) {
-			this.checkCan('bypassall');
-			if (!target) return this.parse(`/help defaultavatar`);
-			const [inputUsername, inputAvatar] = this.splitOne(target);
-			if (!Users.isUsername(inputUsername)) {
-				throw new Chat.ErrorMessage(`"${inputUsername}" is not a valid username.`);
-			}
-			const userid = toID(inputUsername);
-			const avatar = await Avatars.validate(inputAvatar, { rejectOfficial: true });
-
-			if (!Avatars.addAllowed(userid, avatar)) {
-				throw new Chat.ErrorMessage(`User "${inputUsername}" can already use avatar "${avatar}".`);
-			}
-			this.globalModlog('GROUP AVATAR', userid, avatar);
-			this.sendReplyBox(<div>
-				{Avatars.img(avatar)}<br />
-				Added to <username class="username">{inputUsername}</username>
-			</div>);
-		},
-		allowavatarhelp: 'addavatarhelp',
-
-			denyavatar: 'removeavatar',
-				disallowavatar: 'removeavatar',
-					removeavatars: 'removeavatar',
-						removeavatar(target, room, user) {
-			this.checkCan('bypassall');
-			if (!target) return this.parse(`/help defaultavatar`);
-			const [inputUsername, inputAvatar] = this.splitOne(target);
-			if (!Users.isUsername(inputUsername)) {
-				throw new Chat.ErrorMessage(`"${inputUsername}" is not a valid username.`);
-			}
-			const userid = toID(inputUsername);
-			const avatar = Avatars.convert(inputAvatar);
-
-			const allowed = customAvatars[userid]?.allowed.filter(Boolean);
-			if (!allowed) {
-				throw new Chat.ErrorMessage(`${inputUsername} doesn't have any custom avatars.`);
-			}
-			if (avatar) {
-				if (!Avatars.removeAllowed(userid, avatar)) {
-					throw new Chat.ErrorMessage(`${inputUsername} doesn't have access to avatar "${avatar}"`);
-				}
-				this.globalModlog('REMOVE AVATAR', userid, avatar);
-				this.sendReplyBox(<div>
-					{Avatars.img(avatar)}<br />
-					Removed from <username class="username">{inputUsername}</username>
-				</div>);
-			} else {
-				// delete all
-				delete customAvatars[userid];
-				Avatars.save();
-				this.globalModlog('REMOVE AVATARS', userid, allowed.join(','));
-				this.sendReplyBox(<div>
-					{allowed.map(curAvatar => [Avatars.img(curAvatar!), ' '])}<br />
-					Removed from <username class="username">{inputUsername}</username>
-				</div>);
-			}
-		},
-		removeavatarhelp: 'addavatarhelp',
-
-			async avatarusers(target, room, user) {
-			target = '#' + toID(target);
-			if (!Avatars.userCanUse(user, target) && !user.can('alts')) {
-				throw new Chat.ErrorMessage(`You don't have access to avatar "${target}"`);
-			}
-
-			this.runBroadcast();
-
-			const users = [];
-			for (const userid in customAvatars) {
-				if (customAvatars[userid].allowed.includes(target)) {
-					users.push(userid);
-				}
-			}
-			users.sort();
-
-			if (!users.length && !await Avatars.exists(target)) {
-				throw new Chat.ErrorMessage(`Unrecognized avatar "${target}"`);
-			}
-
-			this.sendReplyBox(<>
-				<p>{Avatars.img(target, true)}</p>
-				<p>
-					<code>{target}</code><br />
-					{users ? listUsers(users) : <p>No users currently allowed to use this avatar</p>}
-				</p>
-			</>);
-		},
-
-		moveavatars(target, room, user) {
-			this.checkCan('bypassall');
-			const [from, to] = target.split(',').map(toID);
-			if (!from || !to) {
-				return this.parse(`/help moveavatars`);
-			}
-			if (!customAvatars[from]?.allowed.length) {
-				throw new Chat.ErrorMessage(`That user has no avatars.`);
-			}
-			const existing = customAvatars[to]?.allowed.filter(Boolean);
-			customAvatars[to] = { ...customAvatars[from] };
-			delete customAvatars[from];
-			if (existing) {
-				for (const avatar of existing) {
-					if (!customAvatars[to].allowed.includes(avatar)) {
-						customAvatars[to].allowed.push(avatar);
-					}
-				}
-			}
-			Avatars.save(true);
-			this.sendReply(`Moved ${from}'s avatars to '${to}'.`);
-			this.globalModlog(`MOVEAVATARS`, to, `from ${from}`);
-			Avatars.tryNotify(Users.get(to));
-		},
-		moveavatarshelp: [
-			`/moveavatars [from user], [to user] - Move all of the custom avatars from [from user] to [to user]. Requires: ~`,
-		],
-
-			async masspavatar(target, room, user) {
-			this.checkCan('bypassall');
-
-			const usernames = target.trim().split(/\s*\n|,\s*/)
-				.map(username => username.endsWith('.png') ? username.slice(0, -4) : username);
-			for (const username of usernames) {
-				if (!Users.isUsername(username)) {
-					throw new Chat.ErrorMessage(`Invalid username "${username}"`);
-				}
-				await Avatars.validate('#' + toID(username));
-			}
-
-			const userids = usernames.map(toID);
-			for (const userid of userids) {
-				const avatar = '#' + userid;
-				Avatars.addPersonal(userid, avatar);
-				this.globalModlog('PERSONAL AVATAR', userid, avatar);
-			}
-			this.sendReplyBox(<div>
-				{userids.map(userid => Avatars.img('#' + userid))}<br />
-				Added {userids.length} avatars
-			</div>);
-		},
+		}
+		this.sendReplyBox(<div>
+			{userids.map(userid => Avatars.img('#' + userid))}<br />
+			Added {userids.length} avatars
+		</div>);
+	},
 	async massxmasavatar(target, room, user) {
-			this.checkCan('bypassall');
+		this.checkCan('bypassall');
 
-			const usernames = target.trim().split(/\s*\n|,\s*/)
-				.map(username => username.endsWith('.png') ? username.slice(0, -4) : username)
-				.map(username => username.endsWith('xmas') ? username.slice(0, -4) : username);
-			for (const username of usernames) {
-				if (!Users.isUsername(username)) {
-					throw new Chat.ErrorMessage(`Invalid username "${username}"`);
-				}
-				await Avatars.validate(`#${toID(username)}xmas`);
+		const usernames = target.trim().split(/\s*\n|,\s*/)
+			.map(username => username.endsWith('.png') ? username.slice(0, -4) : username)
+			.map(username => username.endsWith('xmas') ? username.slice(0, -4) : username);
+		for (const username of usernames) {
+			if (!Users.isUsername(username)) {
+				throw new Chat.ErrorMessage(`Invalid username "${username}"`);
 			}
+			await Avatars.validate(`#${toID(username)}xmas`);
+		}
 
-			const userids = usernames.map(toID);
-			for (const userid of userids) {
-				const avatar = `#${userid}xmas`;
-				Avatars.addAllowed(userid, avatar);
-				this.globalModlog('GROUP AVATAR', userid, avatar);
-			}
-			this.sendReplyBox(<div>
-				{userids.map(userid => Avatars.img(`#${userid}xmas`))}<br />
-				Added {userids.length} avatars
-			</div>);
-		},
+		const userids = usernames.map(toID);
+		for (const userid of userids) {
+			const avatar = `#${userid}xmas`;
+			Avatars.addAllowed(userid, avatar);
+			this.globalModlog('GROUP AVATAR', userid, avatar);
+		}
+		this.sendReplyBox(<div>
+			{userids.map(userid => Avatars.img(`#${userid}xmas`))}<br />
+			Added {userids.length} avatars
+		</div>);
+	},
 	async massgavatar(target, room, user) {
-			this.checkCan('bypassall');
+		this.checkCan('bypassall');
 
-			const args = target.trim().split(/\s*\n|,\s*/);
-			let curAvatar = '';
-			const toUpdate: Record<string, Set<ID>> = Object.create(null);
-			for (const arg of args) {
-				if (arg.startsWith('#')) {
-					curAvatar = await Avatars.validate(arg);
-				} else {
-					if (!curAvatar) return this.parse(`/help massgavatar`);
-					if (!/[A-Za-z0-9]/.test(arg.charAt(0)) || !/[A-Za-z]/.test(arg)) {
-						throw new Chat.ErrorMessage(`Invalid username "${arg}"`);
-					}
-					if (!toUpdate[curAvatar]) toUpdate[curAvatar] = new Set();
-					toUpdate[curAvatar].add(toID(arg));
+		const args = target.trim().split(/\s*\n|,\s*/);
+		let curAvatar = '';
+		const toUpdate: Record<string, Set<ID>> = Object.create(null);
+		for (const arg of args) {
+			if (arg.startsWith('#')) {
+				curAvatar = await Avatars.validate(arg);
+			} else {
+				if (!curAvatar) return this.parse(`/help massgavatar`);
+				if (!/[A-Za-z0-9]/.test(arg.charAt(0)) || !/[A-Za-z]/.test(arg)) {
+					throw new Chat.ErrorMessage(`Invalid username "${arg}"`);
+				}
+				if (!toUpdate[curAvatar]) toUpdate[curAvatar] = new Set();
+				toUpdate[curAvatar].add(toID(arg));
+			}
+		}
+
+		const out = [];
+
+		for (const avatar in toUpdate) {
+			const newUsers = toUpdate[avatar];
+			const oldUsers = new Set<ID>();
+			for (const userid in customAvatars) {
+				if (customAvatars[userid].allowed.includes(avatar)) {
+					oldUsers.add(userid as ID);
 				}
 			}
 
-			const out = [];
-
-			for (const avatar in toUpdate) {
-				const newUsers = toUpdate[avatar];
-				const oldUsers = new Set<ID>();
-				for (const userid in customAvatars) {
-					if (customAvatars[userid].allowed.includes(avatar)) {
-						oldUsers.add(userid as ID);
-					}
+			const added: ID[] = [];
+			for (const newUser of newUsers) {
+				if (!oldUsers.has(newUser)) {
+					Avatars.addAllowed(newUser, avatar);
+					added.push(newUser);
+					this.globalModlog('GROUP AVATAR', newUser, avatar);
 				}
-
-				const added: ID[] = [];
-				for (const newUser of newUsers) {
-					if (!oldUsers.has(newUser)) {
-						Avatars.addAllowed(newUser, avatar);
-						added.push(newUser);
-						this.globalModlog('GROUP AVATAR', newUser, avatar);
-					}
+			}
+			const removed: ID[] = [];
+			for (const oldUser of oldUsers) {
+				if (!newUsers.has(oldUser)) {
+					Avatars.removeAllowed(oldUser, avatar);
+					removed.push(oldUser);
+					this.globalModlog('REMOVE AVATAR', oldUser, avatar);
 				}
-				const removed: ID[] = [];
-				for (const oldUser of oldUsers) {
-					if (!newUsers.has(oldUser)) {
-						Avatars.removeAllowed(oldUser, avatar);
-						removed.push(oldUser);
-						this.globalModlog('REMOVE AVATAR', oldUser, avatar);
-					}
-				}
-
-				out.push(<p>{Avatars.img(avatar, true)}</p>);
-				out.push(<div><code>{avatar}</code></div>);
-				if (added.length) out.push(<div>{oldUsers.size ? 'Added' : 'New'}: {listUsers(added)}</div>);
-				if (removed.length) out.push(<div>Removed: {listUsers(removed)}</div>);
-				if (!added.length && !removed.length) out.push(<div>No change</div>);
 			}
 
-			this.sendReplyBox(<>{out}</>);
-			Avatars.save(true);
-		},
-	};
+			out.push(<p>{Avatars.img(avatar, true)}</p>);
+			out.push(<div><code>{avatar}</code></div>);
+			if (added.length) out.push(<div>{oldUsers.size ? 'Added' : 'New'}: {listUsers(added)}</div>);
+			if (removed.length) out.push(<div>Removed: {listUsers(removed)}</div>);
+			if (!added.length && !removed.length) out.push(<div>No change</div>);
+		}
 
-	Users.Avatars = Avatars;
+		this.sendReplyBox(<>{out}</>);
+		Avatars.save(true);
+	},
+};
 
-	Chat.multiLinePattern.register(
-		'/massgavatar', '/masspavatar', '/massxmasavatar',
-	);
+Users.Avatars = Avatars;
+
+Chat.multiLinePattern.register(
+	'/massgavatar', '/masspavatar', '/massxmasavatar',
+);
