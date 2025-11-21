@@ -13,7 +13,7 @@
     "ts-chacha20": "^1.2.0"
   },
   "optionalDependencies": {
-    "better-sqlite3": "^11.10.0",
+    "better-sqlite3": "^0.10.3",
     "cloud-env": "^0.2.3",
     "githubhook": "^1.9.3",
     "nodemailer": "^7.0.5",

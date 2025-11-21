@@ -44,18 +44,18 @@ exports.wsdeflate = {
  *  something.
  * @type {{port: number, options: {key: string, cert: string}} | null}
  */
-exports.ssl = null;
+//exports.ssl = null;
 
-/*
+
 // example:
 exports.ssl = {
 	port: 2053,
 	options: {
-		key: './config/ssl/privkey.pem',
-		cert: './config/ssl/fullchain.pem',
+		key: '/etc/ssl/private/budewinn.it.key',
+		cert: '/etc/ssl/certs/budewinn.it.pem',
 	},
 };
-*/
+
 
 /*
 Main's SSL deploy script from Let's Encrypt looks like:
@@ -179,7 +179,7 @@ exports.crashguard = true;
  *   This is the URL of the user database and ladder mentioned earlier.
  *   Don't change this setting - there aren't any other login servers right now
  */
-exports.loginserver = 'http://play.pokemonshowdown.com/';
+exports.loginserver = 'https://budewinn.it/';
 exports.loginserverkeyalgo = "RSA-SHA1";
 exports.loginserverpublickeyid = 4;
 exports.loginserverpublickey = `-----BEGIN PUBLIC KEY-----
@@ -503,7 +503,7 @@ exports.forcedpublicprefixes = [];
  * startuphook - function to call when the server is fully initialized and ready
  * to serve requests.
  */
-exports.startuphook = function () {};
+exports.startuphook = function () { };
 
 /**
  * lastfmkey - the API key to let users use the last.fm commands from The Studio's

@@ -1,5 +1,48 @@
 export const Items: import('../sim/dex-items').ItemDataTable = {
-
+	lastramassacro: {
+		name: "Lastra Massacro",
+		spritenum: 999,
+		ignoreKlutz: true,
+		num: 9999,
+		gen: 9,
+		onBasePowerPriority: 15,
+		onBasePower(basePower, user, target, move) {
+			if (move?.type === 'Dark' || move?.type === "Poison") {
+				return this.chainModify([4915, 4096]);
+			}
+		},
+		onModifyCritRatio(critRatio) {
+			return critRatio + 2;
+		},
+		onModifyDefPriority: 1,
+		onModifyDef(def) {
+			return this.chainModify(1.5);
+		},
+		onTakeItem: false,
+	},
+	lastracustode: {
+		name: "Lastra Custode",
+		spritenum: 999,
+		ignoreKlutz: true,
+		num: 9999,
+		gen: 9,
+		onBasePowerPriority: 15,
+		onBasePower(basePower, user, target, move) {
+			if (move?.type === 'Fighting' || move?.type === "Ghost") {
+				return this.chainModify([4915, 4096]);
+			}
+		},
+		onDamagingHit(damage, target, source, move) {
+			if (move.type === 'Dark') {
+				this.boost({ atk: 1 });
+			}
+		},
+		onModifyDefPriority: 1,
+		onModifyDef(def) {
+			return this.chainModify(1.5);
+		},
+		onTakeItem: false,
+	},
 	lastrapresente: {
 		name: "Lastra Presente",
 		spritenum: 763,
@@ -18,9 +61,6 @@ export const Items: import('../sim/dex-items').ItemDataTable = {
 		},
 		onTakeItem: false,
 	},
-
-
-
 
 	lastracura: {
 		name: "Lastra Cura",

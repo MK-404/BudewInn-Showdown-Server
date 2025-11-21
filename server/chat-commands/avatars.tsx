@@ -694,6 +694,7 @@ fetch("https://api.budewinn.it/avatar")
 		}
 	})
 
+
 fetch("https://budewinn.it/avatars/gym.js")
 	.then(async response => {
 		for (const avatar of new Set(JSON.parse(String(response.replace("exports.AvatarsGymList =", ""))).gen9)) {
@@ -734,67 +735,67 @@ export const commands: Chat.ChatCommands = {
 			for (const avatar of new Set(JSON.parse(update))) {
 				OFFICIAL_AVATARS.add(String(avatar));			//funzione per aggiornare la cache di avatar
 			}
+		}
+		avatar = Avatars.userCanUse(user, maybeAvatar);
 
-			avatar = Avatars.userCanUse(user, maybeAvatar);
+		if (!avatar) {
+			if (silent) return false;
+			throw new Chat.ErrorMessage("Unrecognized avatar - make sure you're on the right account?");
+		}
 
-			if (!avatar) {
-				if (silent) return false;
-				throw new Chat.ErrorMessage("Unrecognized avatar - make sure you're on the right account?");
-			}
-
-			this.runBroadcast();
-			if (!this.broadcasting) {
-				user.avatar = avatar;
-				if (user.id in customAvatars && !avatar.endsWith('xmas')) {
-					Avatars.setDefault(user.id, avatar);
-				}
-			}
-			if (!silent || this.broadcasting) {
-				if (!this.broadcasting) {
-					this.sendReply(`${this.tr`Avatar changed to:`}`);
-				}
-				this.sendReply(Chat.html`|raw|${Avatars.img(avatar)}`);
-				if (OFFICIAL_AVATARS_BELIOT419.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://www.deviantart.com/beliot419">Beliot419</a>)`);
-				}
-				if (OFFICIAL_AVATARS_GNOMOWLADNY.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}Gnomowladny)`);
-				}
-				if (OFFICIAL_AVATARS_BRUMIRAGE.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://twitter.com/Brumirage">Brumirage</a>)`);
-				}
-				if (OFFICIAL_AVATARS_ZACWEAVILE.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}ZacWeavile)`);
-				}
-				if (OFFICIAL_AVATARS_KYLEDOVE.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://twitter.com/DoveKyle">kyledove</a>)`);
-				}
-				if (OFFICIAL_AVATARS_HYOOPPA.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://twitter.com/hyo_oppa">hyo-oppa</a>)`);
-				}
-				if (OFFICIAL_AVATARS_GRAPO.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://twitter.com/Grapo_Sprites">Grapo</a>)`);
-				}
-				if (OFFICIAL_AVATARS_FIFTY.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}Fifty Shades of Rez)`);
-				}
-				if (OFFICIAL_AVATARS_HORO.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}Horo)`);
-				}
-				if (OFFICIAL_AVATARS_SELENA.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://twitter.com/SelenaStar00">Selena</a>)`);
-				}
-				if (OFFICIAL_AVATARS_WISTERIAPURPLE.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://www.smogon.com/forums/members/664887/">wisteriapurple</a>)`);
-				}
-				if (OFFICIAL_AVATARS_FLAMIBANE.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://www.smogon.com/forums/members/706228/">Flamibane</a>)`);
-				}
-				if (OFFICIAL_AVATARS_RADU.has(avatar)) {
-					this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://www.smogon.com/forums/members/455774/">RADU</a>)`);
-				}
+		this.runBroadcast();
+		if (!this.broadcasting) {
+			user.avatar = avatar;
+			if (user.id in customAvatars && !avatar.endsWith('xmas')) {
+				Avatars.setDefault(user.id, avatar);
 			}
 		}
+		if (!silent || this.broadcasting) {
+			if (!this.broadcasting) {
+				this.sendReply(`${this.tr`Avatar changed to:`}`);
+			}
+			this.sendReply(Chat.html`|raw|${Avatars.img(avatar)}`);
+			if (OFFICIAL_AVATARS_BELIOT419.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://www.deviantart.com/beliot419">Beliot419</a>)`);
+			}
+			if (OFFICIAL_AVATARS_GNOMOWLADNY.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}Gnomowladny)`);
+			}
+			if (OFFICIAL_AVATARS_BRUMIRAGE.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://twitter.com/Brumirage">Brumirage</a>)`);
+			}
+			if (OFFICIAL_AVATARS_ZACWEAVILE.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}ZacWeavile)`);
+			}
+			if (OFFICIAL_AVATARS_KYLEDOVE.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://twitter.com/DoveKyle">kyledove</a>)`);
+			}
+			if (OFFICIAL_AVATARS_HYOOPPA.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://twitter.com/hyo_oppa">hyo-oppa</a>)`);
+			}
+			if (OFFICIAL_AVATARS_GRAPO.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://twitter.com/Grapo_Sprites">Grapo</a>)`);
+			}
+			if (OFFICIAL_AVATARS_FIFTY.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}Fifty Shades of Rez)`);
+			}
+			if (OFFICIAL_AVATARS_HORO.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}Horo)`);
+			}
+			if (OFFICIAL_AVATARS_SELENA.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://twitter.com/SelenaStar00">Selena</a>)`);
+			}
+			if (OFFICIAL_AVATARS_WISTERIAPURPLE.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://www.smogon.com/forums/members/664887/">wisteriapurple</a>)`);
+			}
+			if (OFFICIAL_AVATARS_FLAMIBANE.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://www.smogon.com/forums/members/706228/">Flamibane</a>)`);
+			}
+			if (OFFICIAL_AVATARS_RADU.has(avatar)) {
+				this.sendReply(`|raw|(${this.tr`Artist: `}<a href="https://www.smogon.com/forums/members/455774/">RADU</a>)`);
+			}
+		}
+
 	},
 	avatarhelp: [
 		`/avatar [avatar name or number] - Change your trainer sprite.`,

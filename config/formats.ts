@@ -23,17 +23,17 @@ export const Formats: import('../sim/dex-formats').FormatList = [
 	{
 		name: "[Gen 9] Lega di Paldea! Singles",
 		mod: 'gen9',
-		ruleset: ["Obtainable Formes","Max Team Size = 6","Max Move Count = 4","EV Limit = Auto","Tera Type Preview", 'Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Adjust Level = 50']
+		ruleset: ["Obtainable Formes", "Max Team Size = 6", "Max Move Count = 4", "EV Limit = Auto", "Tera Type Preview", 'Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Adjust Level = 50']
 	},
 	{
 		name: "[Gen 9] Lega di Paldea! Doubles",
 		mod: 'gen9',
 		gameType: 'doubles',
-		ruleset: ["Obtainable Formes","Max Team Size = 6","Max Move Count = 4","EV Limit = Auto","Tera Type Preview", 'Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Adjust Level = 50', 'Picked Team Size = 4',"Best Of = 3"]
+		ruleset: ["Obtainable Formes", "Max Team Size = 6", "Max Move Count = 4", "EV Limit = Auto", "Tera Type Preview", 'Team Preview', 'HP Percentage Mod', 'Cancel Mod', 'Adjust Level = 50', 'Picked Team Size = 4', "Best Of = 3"]
 	},
 
 	{
-		name: "[Gen 9] Triples",
+		name: "[Gen 9] BInn Triples",
 		mod: 'gen9',
 		gameType: 'triples',
 		ruleset: ['Team Preview', 'Cancel Mod', 'Max Team Size = 24', 'Max Move Count = 24', 'Max Level = 9999', 'Default Level = 100'],
@@ -1955,8 +1955,8 @@ export const Formats: import('../sim/dex-formats').FormatList = [
 				move.flags['protect'] = 1;
 				move.category = species.baseStats['spa'] > species.baseStats['atk'] ? 'Special' :
 					species.baseStats['spa'] < species.baseStats['atk'] ? 'Physical' :
-					pokemon.getStat('atk', false, true) > pokemon.getStat('spa', false, true) ? 'Physical' :
-					'Special';
+						pokemon.getStat('atk', false, true) > pokemon.getStat('spa', false, true) ? 'Physical' :
+							'Special';
 				move.onAfterHit = function (t, s, m) {
 					if (s.getAbility().name === species.abilities['0']) return;
 					const effect = 'ability:' + this.toID(species.abilities['0']);
