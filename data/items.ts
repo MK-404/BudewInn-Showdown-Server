@@ -1,4 +1,29 @@
 export const Items: import('../sim/dex-items').ItemDataTable = {
+	lastracanto: {
+		name: "Lastra Canto",
+		spritenum: 999,
+		ignoreKlutz: true,
+		num: 9999,
+		gen: 9,
+		onBasePowerPriority: 15,
+		onBasePower(basePower, user, target, move) {
+			if (move?.type === 'Dragon' || move?.type === 'Fairy') {
+				this.chainModify([4915, 4096]);
+			}
+
+			if (move?.flags?.sound) {
+				this.debug('Punk Rock boost');
+				this.chainModify([5325, 4096]);
+			}
+		},
+		onTakeItem: false,
+		onSourceModifyDamage(damage, source, target, move) {
+			if (move.flags['sound']) {
+				this.debug('Punk Rock weaken');
+				return this.chainModify(0.5);
+			}
+		},
+	},
 	lastramassacro: {
 		name: "Lastra Massacro",
 		spritenum: 999,
