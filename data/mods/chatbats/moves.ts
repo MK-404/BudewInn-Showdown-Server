@@ -284,7 +284,7 @@ export const Moves: import('../../../sim/dex-moves').ModdedMoveDataTable = {
 		secondary: null,
 		target: "normal",
 		type: "Water",
-		zMove: { boost: { atk: 1 } },
+		zMove: { boost: { spe: 1 } },
 		contestType: "Beautiful",
 		desc: "Encore + Rain Dance",
 		shortDesc: "Encore + Rain Dance",
@@ -531,7 +531,7 @@ export const Moves: import('../../../sim/dex-moves').ModdedMoveDataTable = {
 					} else {
 						this.boost({ spe: 3 }, pokemon);
 					}
-					// adds volatile ordered, which prevents the order up effect from occuring again until Dondozo switches out
+					// adds volatile ordered, which prevents the order up effect from occurring again until Dondozo switches out
 					pokemon.addVolatile('ordered');
 					// removes the side condition
 					pokemon.side.removeSideCondition('orderup');
@@ -1311,10 +1311,6 @@ export const Moves: import('../../../sim/dex-moves').ModdedMoveDataTable = {
 				this.add('-fail', source, 'move: Crowverload');
 				return this.NOT_FAIL;
 			}
-			if (source.hp <= source.maxhp / 4) {
-				this.add('-fail', source, 'move: Substitute', '[weak]');
-				return this.NOT_FAIL;
-			}
 		},
 		onAfterMove(source, target, move) {
 			this.actions.useMove('substitute', source, { });
@@ -1532,16 +1528,6 @@ export const Moves: import('../../../sim/dex-moves').ModdedMoveDataTable = {
 					return false;
 				}
 			},
-			onTryHeal(damage, target, source, effect) {
-				if (effect && (effect.id === 'zpower' || (effect as Move).isZ)) return damage;
-				if (source && target !== source && target.hp !== target.maxhp && effect.name === "Pollen Puff") {
-					this.attrLastMove('[still]');
-					// FIXME: Wrong error message, correct one not supported yet
-					this.add('cant', source, 'move: Electric Terrain', effect);
-					return null;
-				}
-				return false;
-			},
 			onFieldResidualOrder: 27,
 			onFieldResidualSubOrder: 7,
 			onFieldEnd() {
@@ -1602,5 +1588,165 @@ export const Moves: import('../../../sim/dex-moves').ModdedMoveDataTable = {
 		},
 		shortDesc: "5 turns. Can't status,-Dragon power vs grounded, +Fairy power.",
 		desc: "5 turns. Can't status,-Dragon power vs grounded, +Fairy power.",
+	},
+	lootbox: {
+		num: -1015,
+		accuracy: 100,
+		basePower: 0,
+		category: "Physical",
+		name: "Loot Box",
+		pp: 15,
+		priority: 0,
+		flags: { protect: 1, mirror: 1, metronome: 1 },
+		onModifyMove(move, pokemon, target) {
+			const rand = this.random(8);
+			if (rand < 2) {
+				move.basePower = 0;
+			} else if (rand < 4) {
+				move.basePower = 60;
+			} else if (rand < 6) {
+				move.basePower = 120;
+			} else {
+				move.basePower = 150;
+			}
+		},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Explosion', target);
+			this.add('-anim', source, 'Mind Blown', target);
+		},
+		secondary: null,
+		target: "normal",
+		type: "Normal",
+		contestType: "Cute",
+		shortDesc: "Present but better.",
+	},
+	sinisterarrows: {
+		num: -1016,
+		accuracy: 100,
+		basePower: 50,
+		category: "Physical",
+		name: "Sinister Arrows",
+		pp: 10,
+		priority: 0,
+		flags: { allyanim: 1, metronome: 1, futuremove: 1 },
+		ignoreImmunity: true,
+		onTry(source, target) {
+			if (!target.side.addSlotCondition(target, 'sinisterarrows')) return false;
+			Object.assign(target.side.slotConditions[target.position]['sinisterarrows'], {
+				move: 'sinisterarrows',
+				source,
+				moveData: {
+					id: 'sinisterarrows',
+					name: "Sinister Arrows",
+					accuracy: 100,
+					basePower: 50,
+					category: "Physical",
+					priority: 0,
+					flags: { allyanim: 1, metronome: 1, futuremove: 1 },
+					ignoreImmunity: false,
+					effectType: 'Move',
+					type: 'Ghost',
+				},
+			});
+			this.add('-start', source, 'move: Sinister Arrows');
+			return this.NOT_FAIL;
+		},
+		onTryMove(target, source, move) {
+			this.add('-anim', source, 'Curse', target);
+			this.add('-anim', source, 'Spite', target);
+		},
+		condition: {
+			onStart(target) {
+				this.effectState.targetSlot = target.getSlot();
+				this.effectState.endingTurn = (this.turn - 1) + 3;
+			},
+			onResidualOrder: 5,
+			onResidualSubOrder: 2,
+			onResidual(target) {
+				const data = this.effectState;
+				// time's up; time to hit! :D
+				const move = this.dex.moves.get(data.move);
+				if (target.fainted || target === data.source) {
+					this.hint(`${move.name} did not hit because the target is ${(target.fainted ? 'fainted' : 'the user')}.`);
+					return;
+				}
+				if (!this.getOverflowedTurnCount()) return;
+				target.removeVolatile('Protect');
+				target.removeVolatile('Endure');
+				if (data.source.hasAbility('infiltrator') && this.gen >= 6) {
+					data.moveData.infiltrates = true;
+				}
+				if (data.source.hasAbility('normalize') && this.gen >= 6) {
+					data.moveData.type = 'Normal';
+				}
+				const hitMove = new this.dex.Move(data.moveData) as ActiveMove;
+				this.actions.trySpreadMoveHit([target], data.source, hitMove, true);
+				this.hint(`${move.name} hits.`);
+				if (data.source.isActive && data.source.hasItem('lifeorb') && this.gen >= 5) {
+					this.singleEvent('AfterMoveSecondarySelf', data.source.getItem(), data.source.itemState, data.source, target, data.source.getItem());
+				}
+				this.activeMove = null;
+				this.checkWin();
+				if (this.getOverflowedTurnCount() >= this.effectState.endingTurn) {
+					target.side.removeSlotCondition(this.getAtSlot(this.effectState.targetSlot), 'sinisterarrows');
+				}
+			},
+		},
+		secondary: null,
+		target: "normal",
+		type: "Ghost",
+		contestType: "Clever",
+		shortDesc: "Hits for 4 turns, even if user switches out.",
+	},
+	mortalspin: {
+		inherit: true,
+		category: "Special",
+	},
+	lastbreakfast: {
+		num: -1020,
+		accuracy: 100,
+		basePower: 80,
+		category: "Physical",
+		name: "Last Breakfast",
+		pp: 15,
+		priority: 0,
+		flags: { protect: 1, mirror: 1, metronome: 1, contact: 1, bite: 1 },
+		onHit(target, source, move) {
+			const numberBerries = 0 + 1 * Number(source.side.totalFainted);
+			for (let i = 0; i < numberBerries; i++) {
+				const possibleBerries = ['aguavberry', 'apicotberry', 'enigmaberry', 'figyberry', 'ganlonberry', 'iapapaberry',
+					'keeberry', 'lansatberry', 'leppaberry', 'liechiberry', 'lumberry', 'magoberry',
+					'marangaberry', 'micleberry',
+					'oranberry', 'petayaberry', 'salacberry', 'sitrusberry', 'starfberry', 'wikiberry',
+					'aspearberry', 'cheriberry', 'chestoberry', 'lumberry', 'pechaberry', 'rawstberry', 'persimberry'];
+				const chosenBerry = this.sample(possibleBerries);
+				const berry = this.dex.items.get(chosenBerry);
+				if (source.hp && berry.isBerry) {
+					if (this.singleEvent('Eat', berry, null, source, source, move)) {
+						this.runEvent('EatItem', source, source, move, berry);
+					}
+					if (berry.onEat) source.ateBerry = true;
+				}
+			}
+		},
+		onTryMove() {
+			this.attrLastMove('[still]');
+		},
+		onPrepareHit(target, source) {
+			this.add('-anim', source, 'Curse', target);
+			this.add('-anim', source, 'Bug Bite', target);
+		},
+		secondary: null,
+		target: "normal",
+		type: "Ghost",
+		contestType: "Cute",
+		shortDesc: "Eats X random berries, where X is fainted teammates.",
+	},
+	superfang: {
+		inherit: true,
+		flags: { contact: 1, protect: 1, mirror: 1, metronome: 1, bite: 1 },
 	},
 };

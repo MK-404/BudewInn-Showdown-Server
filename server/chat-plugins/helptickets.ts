@@ -223,7 +223,7 @@ export class HelpTicket extends Rooms.SimpleRoomGame {
 			this.ticket.claimed = user.name;
 			if (!this.firstClaimTime) {
 				this.firstClaimTime = Date.now();
-				// I'd use the player list for this, but it dosen't track DCs so were checking the userlist
+				// I'd use the player list for this, but it doesn't track DCs so were checking the userlist
 				// Non-staff users in the room currently (+ the ticket creator even if they are staff)
 				const users = Object.entries(this.room.users).filter(
 					u => !((u[1].isStaff && u[1].id !== this.ticket.userid) || !u[1].named)
@@ -458,7 +458,7 @@ export class HelpTicket extends Rooms.SimpleRoomGame {
 		this.room.destroy();
 	}
 
-	// Modified version of RoomGame.destory
+	// Modified version of RoomGame.destroy
 	override destroy() {
 		if (tickets[this.ticket.userid] && this.ticket.open) {
 			// Ticket was not deleted - deleted tickets already have this done to them - and was not closed.
@@ -1365,7 +1365,7 @@ export const textTickets: { [k: string]: TextTicketInfo } = {
 					const str = ipPunishments.map(p => (
 						`${Punishments.punishmentTypes.get(p.type)?.desc || p.type} as ` +
 						`<a href="https://${Config.routes.root}/users/${p.id}">${p.id}</a>` +
-						`${p.reason ? ` (${p.reason})` : ''}`
+						(p.reason ? Utils.html` (${p.reason})` : '')
 					));
 					if (str) buf += `Punishments: ${str.join(' | ')}<br />`;
 				}

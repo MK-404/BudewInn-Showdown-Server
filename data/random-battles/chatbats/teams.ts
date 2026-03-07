@@ -232,7 +232,12 @@ export class RandomChatBatsTeams extends RandomTeams {
 		if (species.id === 'ogerponhearthflame') this.incompatibleMoves(moves, movePool, 'crabhammer', 'stoneedge');
 		if (species.id === 'hitmontop') this.incompatibleMoves(moves, movePool, 'bulkup', 'rapidspin');
 		if (species.id === 'mesprit') this.incompatibleMoves(moves, movePool, 'psychic', 'storedpower');
-		if (species.id === 'mesprit') this.incompatibleMoves(moves, movePool, 'knockoff', 'earthquake');
+		if (species.id === 'primeape') this.incompatibleMoves(moves, movePool, 'knockoff', 'earthquake');
+		if (species.id === 'feraligatrmega') this.incompatibleMoves(moves, movePool, 'thunderfang', 'poisonfang');
+		if (species.id === 'salazzle') this.incompatibleMoves(moves, movePool, 'malignantchain', 'venoshock');
+		if (species.id === 'glimmora') this.incompatibleMoves(moves, movePool, 'powergem', 'meteorbeam');
+		if (species.id === 'wobbuffet') this.incompatibleMoves(moves, movePool, 'shedtail', 'encore');
+		if (species.id === 'wobbuffet') this.incompatibleMoves(moves, movePool, 'nightshade', 'guillotine');
 	}
 
 	override randomMoveset(
@@ -713,6 +718,15 @@ export class RandomChatBatsTeams extends RandomTeams {
 		if (species.id === 'primeape') return 'Eviolite';
 		if (species.id === 'rillaboom') return 'Heavy-Duty Boots';
 		if (species.id === 'mandibuzz') return 'Thick Club';
+		if (species.id === 'feraligatr') return 'Life Orb';
+		if (species.id === 'salazzle') return 'Heavy-Duty Boots';
+		if (species.id === 'kyogre') return 'Waterium Z';
+		if (species.id === 'azelf') return 'Focus Band';
+		if (species.id === 'decidueye') return this.sample(['Life Orb', 'Heavy-Duty Boots', "Leftovers"]);
+		if (species.id === 'ogerponcornerstone') return 'Cornerstone Mask';
+		if (species.id === 'glimmora' && moves.has('meteorbeam')) return 'Power Herb';
+		if (species.id === 'glimmora') return 'Air Balloon';
+		if (species.id === 'wobbuffet') return 'Covert Cloak';
 	}
 
 	override randomSet(
@@ -886,7 +900,7 @@ export class RandomChatBatsTeams extends RandomTeams {
 		let leadsRemaining = this.format.gameType === 'doubles' ? 2 : 1;
 		while (baseSpeciesPool.length && pokemon.length < this.maxTeamSize) {
 			const baseSpecies = this.sampleNoReplace(baseSpeciesPool);
-			if (hasMega && (baseSpecies === "Typhlosion" || baseSpecies === "Altaria")) continue;
+			if (hasMega && (baseSpecies === "Typhlosion" || baseSpecies === "Altaria" || baseSpecies === "Raticate")) continue;
 			const currentSpeciesPool: Species[] = [];
 			// Check if the base species has a mega forme available
 			// let canMega = false;
@@ -997,7 +1011,7 @@ export class RandomChatBatsTeams extends RandomTeams {
 			// if (potd?.exists && (pokemon.length === 1 || this.maxTeamSize === 1)) species = potd;
 
 			// testing code
-			// if (pokemon.length === 0 || this.maxTeamSize === 1) species = this.dex.species.get('Mew');
+			// if (pokemon.length === 0 || this.maxTeamSize === 1) species = this.dex.species.get('Raticate-Mega');
 
 			let set: RandomTeamsTypes.RandomSet;
 

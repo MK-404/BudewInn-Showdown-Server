@@ -3490,7 +3490,7 @@ export const Moves: import('../sim/dex-moves').MoveDataTable = {
 		flags: { protect: 1, reflectable: 1, mirror: 1, metronome: 1 },
 		status: 'slp',
 		onTry(source, target, move) {
-			if (source.species.name === 'Darkrai' || move.hasBounced) {
+			if (source.species.baseSpecies === 'Darkrai' || move.hasBounced) {
 				return;
 			}
 			this.add('-fail', source, 'move: Dark Void');
@@ -8643,7 +8643,7 @@ export const Moves: import('../sim/dex-moves').MoveDataTable = {
 			onRestart(target, source, effect) {
 				if (effect?.name === 'Psychic Noise') return;
 
-				this.add('-fail', target, 'move: Heal Block'); // Succeeds to supress downstream messages
+				this.add('-fail', target, 'move: Heal Block'); // Succeeds to suppress downstream messages
 				if (!source.moveThisTurnResult) {
 					source.moveThisTurnResult = false;
 				}
@@ -14946,10 +14946,9 @@ export const Moves: import('../sim/dex-moves').MoveDataTable = {
 		priority: 0,
 		flags: { contact: 1, protect: 1, mirror: 1, metronome: 1 },
 		beforeTurnCallback(pokemon) {
-			for (const side of this.sides) {
-				if (side.hasAlly(pokemon)) continue;
-				side.addSideCondition('pursuit', pokemon);
-				const data = side.getSideConditionData('pursuit');
+			for (const target of pokemon.foes()) {
+				target.addVolatile('pursuit');
+				const data = target.volatiles['pursuit'];
 				if (!data.sources) {
 					data.sources = [];
 				}
@@ -14958,9 +14957,6 @@ export const Moves: import('../sim/dex-moves').MoveDataTable = {
 		},
 		onModifyMove(move, source, target) {
 			if (target?.beingCalledBack || target?.switchFlag) move.accuracy = true;
-		},
-		onTryHit(target, pokemon) {
-			target.side.removeSideCondition('pursuit');
 		},
 		condition: {
 			duration: 1,
@@ -17265,34 +17261,8 @@ export const Moves: import('../sim/dex-moves').MoveDataTable = {
 		pp: 10,
 		priority: 0,
 		flags: { protect: 1, mirror: 1, bypasssub: 1, allyanim: 1, metronome: 1 },
-		onTryHit(target, source) {
-			const targetAbility = target.getAbility();
-			const sourceAbility = source.getAbility();
-			if (sourceAbility.flags['failskillswap'] || targetAbility.flags['failskillswap'] || target.volatiles['dynamax']) {
-				return false;
-			}
-			const sourceCanBeSet = this.runEvent('SetAbility', source, source, this.effect, targetAbility);
-			if (!sourceCanBeSet) return sourceCanBeSet;
-			const targetCanBeSet = this.runEvent('SetAbility', target, source, this.effect, sourceAbility);
-			if (!targetCanBeSet) return targetCanBeSet;
-		},
 		onHit(target, source, move) {
-			const targetAbility = target.getAbility();
-			const sourceAbility = source.getAbility();
-			if (target.isAlly(source)) {
-				this.add('-activate', source, 'move: Skill Swap', '', '', `[of] ${target}`);
-			} else {
-				this.add('-activate', source, 'move: Skill Swap', targetAbility, sourceAbility, `[of] ${target}`);
-			}
-			this.singleEvent('End', sourceAbility, source.abilityState, source);
-			this.singleEvent('End', targetAbility, target.abilityState, target);
-			source.ability = targetAbility.id;
-			target.ability = sourceAbility.id;
-			source.abilityState = { id: this.toID(source.ability), target: source };
-			target.abilityState = { id: this.toID(target.ability), target: target };
-			if (!target.isAlly(source)) target.volatileStaleness = 'external';
-			this.singleEvent('Start', targetAbility, source.abilityState, source);
-			this.singleEvent('Start', sourceAbility, target.abilityState, target);
+			return this.skillSwap(source, target);
 		},
 		secondary: null,
 		target: "normal",

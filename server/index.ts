@@ -127,7 +127,9 @@ function setupGlobals() {
 	global.TeamValidatorAsync = TeamValidatorAsync;
 
 	global.Sockets = Sockets;
-	Sockets.start(Config.subprocessescache);
+	if (!Config.lazysockets) {
+		Sockets.start(Config.subprocessescache);
+	}
 }
 
 export const readyPromise = cleanupStale().then(() => {
@@ -164,7 +166,7 @@ export const readyPromise = cleanupStale().then(() => {
 
 		process.on('unhandledRejection', err => {
 			// TODO:
-			// - Compability with https://nodejs.org/api/cli.html#cli_unhandled_rejections_mode
+			// - Compatibility with https://nodejs.org/api/cli.html#cli_unhandled_rejections_mode
 			// - Crashlogger API for reporting rejections vs exceptions
 			Monitor.crashlog(err as any, 'A main process Promise');
 		});
