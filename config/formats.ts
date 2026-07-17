@@ -74,6 +74,42 @@ export const Formats: import('../sim/dex-formats').FormatList = [
 			'Steel Gem', 'Water Gem', 'Fairy Gem'
 		],
 	},
+	{
+		name: "[Gen 9] Coppa Amyrand - Classica [Doubles]",
+		mod: 'coppaamyrand',
+		gameType: 'doubles',
+		ruleset: [
+			'Obtainable Formes', 'Obtainable Abilities', 'Obtainable Misc',
+			'Terastal Clause', 'Team Preview', 'Force Open Team Sheets', 'Picked Team Size = 4',
+			'Max Team Size = 6', 'Max Move Count = 4', 'Adjust Level = 50', 'EV Limit = Auto',
+			'Item Clause = 1', 'VGC Timer', 'Cancel Mod', 'Best Of = 3'
+		],
+		banlist: [
+			'Slowbro-Galar + Slowbronite', 'Tatsugiri + Commander', 'Indeedee-F + Expanding Force',
+			'Assist', 'Return', 'Frustration', 'Hidden Power', 'Pursuit',
+			'Hail', 'Aromatherapy', 'Autotomize', 'Barrage', 'Barrier', 'Bide', 'Bestow', 'Bone Club',
+			'Bubble', 'Burn Up', 'Camouflage', 'Captivate', 'Chip Away', 'Clamp', 'Comet Punch',
+			'Constrict', 'Crafty Shield', 'Dizzy Punch', 'Double Slap', 'Dragon Rage', 'Dual Chop',
+			'Egg Bomb', 'Embargo', 'Feint Attack', 'Flame Burst', 'Flash', 'Flower Shield', 'Foresight',
+			'Grass Whistle', 'Grudge', 'Heal Block', 'Heal Order', 'Heart Stamp', 'Ice Ball', 'Ion Deluge',
+			'Jump Kick', 'Karate Chop', 'Laser Focus', 'Leaf Tornado', 'Lucky Chant', 'Magic Coat',
+			'Magnet Bomb', 'Magnitude', 'Mat Block', 'Me First', 'Meditate', 'Mind Reader', 'Miracle Eye',
+			'Mirror Move', 'Mirror Shot', 'Mud Bomb', 'Mud Sport', 'Natural Gift', 'Nature Power',
+			'Needle Arm', 'Nightmare', 'Odor Sleuth', 'Ominous Wind', 'Powder', 'Power-Up Punch',
+			'Psycho Shift', 'Psywave', 'Punishment', 'Rage', 'Razor Wind', 'Refresh', 'Revenge',
+			'Rock Climb', 'Rolling Kick', 'Rototiller', 'Secret Power', 'Sharpen', 'Signal Beam',
+			'Silver Wind', 'Skull Bash', 'Sky Drop', 'Sky Uppercut', 'Smelling Salts', 'Snatch',
+			'Spider Web', 'Spike Cannon', 'Spotlight', 'Steamroller', 'Storm Throw', 'Submission',
+			'Synchronoise', 'Telekinesis', 'Trump Card', 'Twineedle', 'Venom Drench', 'Vital Throw',
+			'Wake-Up Slap', 'Water Sport', 'Wring Out',
+			'Buginium Z', 'Darkinium Z', 'Dragonium Z', 'Electrium Z', 'Fairium Z', 'Fightinium Z',
+			'Firium Z', 'Flyinium Z', 'Ghostium Z', 'Grassium Z', 'Groundium Z', 'Icium Z', 'Normalium Z',
+			'Poisonium Z', 'Psychium Z', 'Rockium Z', 'Steelium Z', 'Waterium Z',
+			'Bug Gem', 'Dark Gem', 'Dragon Gem', 'Electric Gem', 'Fighting Gem', 'Fire Gem', 'Flying Gem',
+			'Ghost Gem', 'Grass Gem', 'Ground Gem', 'Ice Gem', 'Poison Gem', 'Psychic Gem', 'Rock Gem',
+			'Steel Gem', 'Water Gem', 'Fairy Gem'
+		],
+	},
 
 	// S/V Singles
 	///////////////////////////////////////////////////////////////////

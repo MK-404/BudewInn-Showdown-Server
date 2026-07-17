@@ -86,6 +86,40 @@ export const Items: import('../sim/dex-items').ItemDataTable = {
 		},
 		onTakeItem: false,
 	},
+	lastragrazia: {
+		name: "Lastra Grazia",
+		spritenum: 999,
+		ignoreKlutz: true,
+		num: 9999,
+		gen: 9,
+		onBasePowerPriority: 15,
+		onBasePower(basePower, user, target, move) {
+			if (move?.type === 'Ghost') {
+				return this.chainModify([6144, 4096]);
+			}
+		},
+		onModifySpe(spe) {
+			return this.chainModify(0.5);
+		},
+		onTakeItem: false,
+	},
+	lastraazzardo: {
+		name: "Lastra Azzardo",
+		spritenum: 999,
+		ignoreKlutz: true,
+		num: 9999,
+		gen: 9,
+		onBasePowerPriority: 15,
+		onBasePower(basePower, user, target, move) {
+			if (move?.type === 'Steel') {
+				return this.chainModify([4915, 4096]);
+			}
+		},
+		onModifySpe(spe) {
+			return this.chainModify(0.5);
+		},
+		onTakeItem: false,
+	},
 
 	lastracura: {
 		name: "Lastra Cura",

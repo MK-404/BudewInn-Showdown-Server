@@ -12239,7 +12239,7 @@ export const Moves: import('../sim/dex-moves').MoveDataTable = {
 				randomMove = this.sample(moves).id;
 			}
 			if (!randomMove) return false;
-			this.actions.useMove(randomMove, pokemon);
+			this.actions.useMove(randomMove, source);
 		},
 		callsMove: true,
 		secondary: null,

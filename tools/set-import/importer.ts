@@ -563,7 +563,7 @@ export function fetch(u: string) {
 		// @ts-expect-error Typescript bug - thinks the second argument should be RequestOptions, not a callback
 		const req = client.get(u, (res: IncomingMessage) => {
 			if (res.statusCode !== 200) {
-				if (res.statusCode >= 500 && res.statusCode < 600) {
+				if (res.statusCode === 429 || (res.statusCode >= 500 && res.statusCode < 600)) {
 					return reject(new RetryableError(`HTTP ${res.statusCode}`));
 				} else if (res.statusCode >= 300 && res.statusCode <= 400 && res.headers.location) {
 					resolve(fetch(url.resolve(u, res.headers.location)));
