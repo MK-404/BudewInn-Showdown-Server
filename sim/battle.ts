@@ -1850,7 +1850,7 @@ export class Battle {
 
 		if (!this.ruleTable.has('endlessbattleclause')) return;
 		// for now, FFA doesn't support Endless Battle Clause
-		if (this.format.gameType === 'freeforall') return;
+		if (this.gameType === 'freeforall') return;
 
 		// Are all Pokemon on every side stale, with at least one side containing an externally stale Pokemon?
 		if (!stalenessBySide.every(s => !!s) || !stalenessBySide.some(s => s === 'external')) return;
@@ -3313,7 +3313,7 @@ export class Battle {
 	 * https://www.smogon.com/forums/threads/10352797
 	 */
 	getOverflowedTurnCount(): number {
-		return this.gen >= 8 ? (this.turn - 1) % 256 : this.turn - 1;
+		return this.gen >= 8 ? this.trunc(this.turn - 1, 8) : this.turn - 1;
 	}
 
 	initEffectState(obj: Partial<EffectState>, effectOrder?: number): EffectState {
