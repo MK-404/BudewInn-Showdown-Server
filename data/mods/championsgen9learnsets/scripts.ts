@@ -22,12 +22,14 @@
  *   with reintroduced Pokémon) - those must stay available. So availability
  *   here is the union of what either side allows: something is only left
  *   restricted if *both* Gen 9 and Champions restrict it.
- * - species: same union as moves/items - every Pokémon either side allows is
- *   usable, including Champions' ~130 old-gen returnees regardless of
- *   whether they tie into a Mega Evolution. The format's ruleset is what
- *   restricts *mechanics* to Mega Evolution only (Z-Moves banned via Z-Move
- *   Clause; Dynamax/Max Moves don't exist in this dex to begin with) - it's
- *   not meant to make any Pokémon unusable.
+ * - species: every Pokémon either side allows is usable (same union as
+ *   moves/items), PLUS every species tagged "Past" even when *both* sides
+ *   restrict it (Mantine, ~360 others - like National Dex's "+Past" rule,
+ *   which is the actual behavior being matched here; "Future"/"CAP"/"LGPE"/
+ *   "Custom" species stay restricted, same as National Dex). The format's
+ *   ruleset is what restricts *mechanics* to Mega Evolution only (Z-Moves
+ *   banned via Z-Move Clause; Dynamax/Max Moves don't exist in this dex to
+ *   begin with) - it's not meant to make any Pokémon unusable.
  *   Champions sometimes only curates the final evolution of a line (e.g.
  *   Machamp, but not Machop/Machoke) - once a species is available, its
  *   whole prevo chain is force-unlocked too, tagged "NFE", since otherwise
@@ -94,6 +96,20 @@ export const Scripts: ModdedBattleScriptsData = {
 				// "Illegal" - swap in Gen 9's own tier now that it's available.
 				if (dataType === 'FormatsData' && baseTable[id]?.tier) entry.tier = baseTable[id].tier;
 			}
+		}
+
+		// Species tagged "Past" (unlike "Future"/"CAP"/"LGPE"/"Custom") are
+		// unlocked even when both Gen 9 and Champions restrict them - matching
+		// National Dex's "+Past" rule (dex-formats.ts's Obtainable check treats
+		// them the same way once that rule/tag is active). Gen 9's National Dex
+		// tier is the natural fit here when it has one.
+		for (const id in this.data.FormatsData) {
+			const entry = this.data.FormatsData[id] as AnyObject;
+			if (entry?.isNonstandard !== 'Past') continue;
+			const owned = this.modData('FormatsData', id);
+			delete owned.isNonstandard;
+			const baseEntry = baseDex.data.FormatsData[id] as AnyObject | undefined;
+			owned.tier = baseEntry?.natDexTier || baseEntry?.tier || owned.tier;
 		}
 
 		// Force-unlock any still-restricted prevo of a now-available species
