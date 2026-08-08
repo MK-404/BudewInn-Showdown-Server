@@ -18,8 +18,8 @@ The column value will be ignored for repeat sections.
 */
 
 export const Formats: import('../sim/dex-formats').FormatList = [
+	{ section: "Old" },
 
-	{ section: "BudewInn" },
 	{
 		name: "[Gen 9] Lega di Paldea! Singles",
 		mod: 'gen9',
@@ -109,6 +109,23 @@ export const Formats: import('../sim/dex-formats').FormatList = [
 			'Ghost Gem', 'Grass Gem', 'Ground Gem', 'Ice Gem', 'Poison Gem', 'Psychic Gem', 'Rock Gem',
 			'Steel Gem', 'Water Gem', 'Fairy Gem'
 		],
+	},
+
+
+	{ section: "BudewInn" },
+
+	{
+		name: "[Gen 9 Champions] BudewInn Sinafeia Singles",
+		desc: `Champions battle mechanics (move/ability/item rebalances, 20 PP cap) with the standard Gen 9 dex, learnsets and item pool. All Pok&eacute;mon usable (no bans), fixed Level 50, standard team size and legality clauses.`,
+		mod: 'championsgen9learnsets',
+		ruleset: ['Standard'],
+	},
+	{
+		name: "[Gen 9 Champions] BudewInn Sinafeia Doubles",
+		desc: `Champions battle mechanics (move/ability/item rebalances, 20 PP cap) with the standard Gen 9 dex, learnsets and item pool. All Pok&eacute;mon usable (no bans), fixed Level 50, bring 6 pick 4, standard legality clauses.`,
+		mod: 'championsgen9learnsets',
+		gameType: 'doubles',
+		ruleset: ['Standard', 'Picked Team Size = 4'],
 	},
 
 	// S/V Singles
@@ -4220,7 +4237,7 @@ export const Formats: import('../sim/dex-formats').FormatList = [
 			'Poison Heal', 'Power Construct', 'Pressure', 'Pure Power', 'Rain Dish', 'Rough Skin', 'Sand Spit', 'Sand Stream', 'Seed Sower', 'Spicy Spray', 'Stamina',
 			'Toxic Chain', 'Volt Absorb', 'Water Absorb', 'Wonder Guard', 'Harvest + Jaboca Berry', 'Harvest + Rowap Berry', 'Aguav Berry', 'Assault Vest', 'Berry',
 			'Berry Juice', 'Berserk Gene', 'Black Sludge', 'Chandelurite', 'Chimechite', 'Enigma Berry', 'Figy Berry', 'Gold Berry', 'Iapapa Berry', 'Kangaskhanite',
-			'Leftovers', 'Mago Berry', 'Mawilite',	'Medichamite', 'Scovillainite', 'Starminite', 'Steel Memory', 'Oran Berry', 'Rocky Helmet', 'Shell Bell',
+			'Leftovers', 'Mago Berry', 'Mawilite', 'Medichamite', 'Scovillainite', 'Starminite', 'Steel Memory', 'Oran Berry', 'Rocky Helmet', 'Shell Bell',
 			'Sitrus Berry', 'Tatsugirinite', 'Wiki Berry',
 		],
 		onValidateSet(set) {
