@@ -28,6 +28,12 @@
  *   restricts *mechanics* to Mega Evolution only (Z-Moves banned via Z-Move
  *   Clause; Dynamax/Max Moves don't exist in this dex to begin with) - it's
  *   not meant to make any Pokémon unusable.
+ *   Champions sometimes only curates the final evolution of a line (e.g.
+ *   Machamp, but not Machop/Machoke) - once a species is available, its
+ *   whole prevo chain is force-unlocked too, tagged "NFE", since otherwise
+ *   you could own the final forme but never legally breed/level into it.
+ *   Those prevos need a synthetic Gen 9 learnset the same way Champions'
+ *   own reintroduced species do (see below), since neither side has one.
  *
  *   Non-availability fields (base power, PP, effects, tiers, ...) are left
  *   exactly as Champions defines them.
@@ -87,6 +93,32 @@ export const Scripts: ModdedBattleScriptsData = {
 				// Gen 9 doesn't, so its "tier" field is still Champions' stale
 				// "Illegal" - swap in Gen 9's own tier now that it's available.
 				if (dataType === 'FormatsData' && baseTable[id]?.tier) entry.tier = baseTable[id].tier;
+			}
+		}
+
+		// Force-unlock any still-restricted prevo of a now-available species
+		// (Machop/Machoke for Machamp, ...), and give it a synthetic Gen 9
+		// learnset the same way Champions tags its own reintroduced species,
+		// since neither Gen 9 nor Champions has real Gen 9 data for it either.
+		const pokedex = this.data.Pokedex as AnyObject;
+		for (const id in this.data.FormatsData) {
+			if ((this.data.FormatsData[id] as AnyObject)?.isNonstandard) continue;
+			let prevoName = pokedex[id]?.prevo;
+			while (prevoName) {
+				const prevoId = this.toID(prevoName);
+				const prevoFormatsData = this.data.FormatsData[prevoId] as AnyObject | undefined;
+				if (!prevoFormatsData?.isNonstandard) break; // already available (or no entry to fix)
+				const entry = this.modData('FormatsData', prevoId);
+				delete entry.isNonstandard;
+				entry.tier = 'NFE';
+
+				const learnset = (this.data.Learnsets[prevoId] as AnyObject | undefined)?.learnset as AnyObject | undefined;
+				if (learnset && !Object.values(learnset).some((tags: any) => tags.includes('9M'))) {
+					const learnsetEntry = this.modData('Learnsets', prevoId);
+					for (const moveid in learnsetEntry.learnset) learnsetEntry.learnset[moveid] = ['9M'];
+				}
+
+				prevoName = pokedex[prevoId]?.prevo;
 			}
 		}
 	},
