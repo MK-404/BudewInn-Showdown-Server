@@ -81,7 +81,12 @@ export const Scripts: ModdedBattleScriptsData = {
 			for (const id in ownTable) {
 				if (!ownTable[id]?.isNonstandard) continue;
 				if (baseTable[id]?.isNonstandard) continue;
-				delete this.modData(dataType, id).isNonstandard;
+				const entry = this.modData(dataType, id);
+				delete entry.isNonstandard;
+				// Champions restricts this species (Arceus formes, etc.) while
+				// Gen 9 doesn't, so its "tier" field is still Champions' stale
+				// "Illegal" - swap in Gen 9's own tier now that it's available.
+				if (dataType === 'FormatsData' && baseTable[id]?.tier) entry.tier = baseTable[id].tier;
 			}
 		}
 	},
