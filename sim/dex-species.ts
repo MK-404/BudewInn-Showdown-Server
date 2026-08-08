@@ -745,7 +745,11 @@ export class DexSpecies {
 		} else if (species.prevo) {
 			// there used to be a check for Hidden Ability here, but apparently it's unnecessary
 			// Shed Skin Pupitar can definitely evolve into Unnerve Tyranitar
-			if (this.dex.currentMod.startsWith('champions')) return null;
+			// championsgen9learnsets uses real Gen 9 learnset data for Gen 9-native
+			// species (unlike Champions' own synthetic ones, which put the full
+			// moveset directly on each species), so it still needs prevo-chain
+			// move inheritance (e.g. Weavile's Icicle Crash, a Sneasel egg move).
+			if (this.dex.currentMod.startsWith('champions') && this.dex.currentMod !== 'championsgen9learnsets') return null;
 			species = this.get(species.prevo);
 			if (species.gen > Math.max(2, this.dex.gen)) return null;
 			return species;
