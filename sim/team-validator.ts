@@ -1145,7 +1145,9 @@ export class TeamValidator {
 		const dex = this.dex;
 
 		const allowAVs = !ruleTable.has('lgpenormalrules');
-		const useStatPoints = dex.currentMod.startsWith('champions');
+		// championsgen9learnsets keeps Champions' battle mechanics but uses the
+		// standard Gen 9 EV/IV system instead of Champions' own Stat Points one.
+		const useStatPoints = dex.currentMod.startsWith('champions') && dex.currentMod !== 'championsgen9learnsets';
 		const evLimit = ruleTable.evLimit;
 		const canBottleCap = dex.gen >= 7 && (set.level >= (dex.gen < 9 ? 100 : 50) || !ruleTable.has('obtainablemisc'));
 

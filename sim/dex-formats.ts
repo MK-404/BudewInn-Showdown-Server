@@ -345,7 +345,10 @@ export class RuleTable extends Map<string, string> {
 			if (format.mod === 'gen7letsgo') {
 				this.evLimit = this.has('lgpenormalrules') ? 0 : null;
 			}
-			if (format.mod.startsWith('champions')) {
+			if (format.mod.startsWith('champions') && format.mod !== 'championsgen9learnsets') {
+				// championsgen9learnsets keeps Champions' battle mechanics but uses
+				// the standard Gen 9 EV system (510 total) instead of Champions'
+				// own Stat Points system (see team-validator.ts's useStatPoints).
 				this.evLimit = 66;
 			}
 			// Gen 6 hackmons also has a limit, which is currently implemented
