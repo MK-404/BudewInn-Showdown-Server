@@ -118,14 +118,14 @@ export const Formats: import('../sim/dex-formats').FormatList = [
 		name: "[Gen 9 Champions] BudewInn Sinafeia Singles",
 		desc: `Champions battle mechanics (move/ability/item rebalances, 20 PP cap) with the standard Gen 9 dex, learnsets and item pool. All Pok&eacute;mon and items usable (no bans besides Z-Crystals), Mega Evolution only (no Z-Moves), fixed Level 50, standard team size and legality clauses.`,
 		mod: 'championsgen9learnsets',
-		ruleset: ['Standard', 'Z-Move Clause'],
+		ruleset: ['Standard', 'Z-Move Clause', 'Min Source Gen = 1'],
 	},
 	{
 		name: "[Gen 9 Champions] BudewInn Sinafeia Doubles",
 		desc: `Champions battle mechanics (move/ability/item rebalances, 20 PP cap) with the standard Gen 9 dex, learnsets and item pool. All Pok&eacute;mon and items usable (no bans besides Z-Crystals), Mega Evolution only (no Z-Moves), fixed Level 50, bring 6 pick 4, standard legality clauses.`,
 		mod: 'championsgen9learnsets',
 		gameType: 'doubles',
-		ruleset: ['Standard', 'Z-Move Clause', 'Picked Team Size = 4'],
+		ruleset: ['Standard', 'Z-Move Clause', 'Min Source Gen = 1', 'Picked Team Size = 4'],
 	},
 
 	// S/V Singles
