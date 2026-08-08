@@ -22,13 +22,12 @@
  *   with reintroduced Pokémon) - those must stay available. So availability
  *   here is the union of what either side allows: something is only left
  *   restricted if *both* Gen 9 and Champions restrict it.
- * - species: same union, but narrower. Champions brings back ~130 old-gen
- *   Pokémon Gen 9 doesn't support, only part of which carry a Mega
- *   Evolution. Only that Mega-related part (Mega formes themselves, and
- *   base species that have one, e.g. Alakazam for Mega Alakazam) is
- *   unlocked here - the Mega mechanic needs it. Old-gen returnees with no
- *   Mega tie (Roserade, Furfrou, Aegislash, Castform, ...) stay Gen
- *   9-only, i.e. unavailable, same as in stock Gen 9.
+ * - species: same union as moves/items - every Pokémon either side allows is
+ *   usable, including Champions' ~130 old-gen returnees regardless of
+ *   whether they tie into a Mega Evolution. The format's ruleset is what
+ *   restricts *mechanics* to Mega Evolution only (Z-Moves banned via Z-Move
+ *   Clause; Dynamax/Max Moves don't exist in this dex to begin with) - it's
+ *   not meant to make any Pokémon unusable.
  *
  *   Non-availability fields (base power, PP, effects, tiers, ...) are left
  *   exactly as Champions defines them.
@@ -76,37 +75,13 @@ export const Scripts: ModdedBattleScriptsData = {
 			if (baseLearnset) this.data.Learnsets[id] = baseLearnset;
 		}
 
-		const pokedex = this.data.Pokedex as AnyObject;
-		const isMegaRelated = (id: string): boolean => {
-			const entry = pokedex[id];
-			if (!entry) return false;
-			if ((entry.forme || '').includes('Mega')) return true;
-			return (entry.otherFormes || []).some((forme: string) => forme.includes('Mega'));
-		};
-
-		for (const dataType of ['Moves', 'Items'] as const) {
+		for (const dataType of ['FormatsData', 'Moves', 'Items'] as const) {
 			const ownTable = this.data[dataType] as AnyObject;
 			const baseTable = baseDex.data[dataType] as AnyObject;
 			for (const id in ownTable) {
 				if (!ownTable[id]?.isNonstandard) continue;
 				if (baseTable[id]?.isNonstandard) continue;
 				delete this.modData(dataType, id).isNonstandard;
-			}
-		}
-
-		// Species availability isn't a simple union: unlike moves/items, Champions
-		// leaves most of its ~130 old-gen returnees with *no* isNonstandard entry
-		// at all (fully standard as far as Champions' own data is concerned), so
-		// there's nothing to "leave alone" - we have to actively restore Gen 9's
-		// restriction for the non-Mega ones instead of only ever removing one.
-		for (const id in this.data.FormatsData) {
-			const baseNonstandard = baseDex.data.FormatsData[id]?.isNonstandard;
-			const shouldBeAvailable = !baseNonstandard || isMegaRelated(id);
-			const formatsData = this.data.FormatsData[id] as AnyObject;
-			if (shouldBeAvailable) {
-				if (formatsData?.isNonstandard) delete this.modData('FormatsData', id).isNonstandard;
-			} else if (formatsData?.isNonstandard !== baseNonstandard) {
-				this.modData('FormatsData', id).isNonstandard = baseNonstandard;
 			}
 		}
 	},
