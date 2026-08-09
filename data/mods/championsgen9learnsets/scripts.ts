@@ -14,29 +14,15 @@
  *   learnset data to fall back on (none of their moves carry a "9" tag
  *   anywhere), so for those we keep Champions' own synthetic learnset;
  *   replacing it would leave them with almost no legal moves.
- * - moves/items: Champions marks a lot of these `isNonstandard` ("Past")
- *   that Gen 9 itself allows, which would otherwise punch holes in the Gen 9
- *   learnsets we just restored (e.g. King's Shield, Stormthrow). But
- *   Champions *also* deliberately un-restricts things Gen 9 marks "Past"
- *   that don't exist in Gen 9 proper (Mega Stones and a few moves that go
- *   with reintroduced Pokémon) - those must stay available. So availability
- *   here is the union of what either side allows: something is only left
- *   restricted if *both* Gen 9 and Champions restrict it.
- * - species: every Pokémon either side allows is usable (same union as
- *   moves/items), PLUS every species tagged "Past" even when *both* sides
- *   restrict it (Mantine, ~360 others - like National Dex's "+Past" rule,
- *   which is the actual behavior being matched here; "Future"/"CAP"/"LGPE"/
- *   "Custom" species stay restricted, same as National Dex). The format's
- *   ruleset is what restricts *mechanics* to Mega Evolution only (Z-Moves
- *   banned via Z-Move Clause; Dynamax/Max Moves don't exist in this dex to
- *   begin with) - it's not meant to make any Pokémon unusable.
- *   Champions sometimes only curates the final evolution of a line (e.g.
- *   Machamp, but not Machop/Machoke) - once a species is available, its
- *   whole prevo chain is force-unlocked too, tagged "NFE", since otherwise
- *   you could own the final forme but never legally breed/level into it.
- *   Those prevos need a synthetic Gen 9 learnset the same way Champions'
- *   own reintroduced species do (see below), since neither side has one.
- *
+ * - species/moves/items: available if *either* side allows it (Champions
+ *   restricts a lot Gen 9 itself allows, e.g. King's Shield/Stormthrow/most
+ *   of the Gen 9 dex outside Champions' curated allowlist; Champions also
+ *   deliberately un-restricts things Gen 9 doesn't have at all, e.g. Mega
+ *   Stones/Evolutions) - PLUS anything tagged "Past" or "Unobtainable" even
+ *   when *both* sides restrict it (Mantine, Hidden Power, ~600 others).
+ *   This mirrors National Dex's "+Past"/"+Unobtainable" rules, which is the
+ *   actual behavior being matched here. "Future"/"CAP"/"LGPE"/"Custom" stay
+ *   restricted, same as National Dex doesn't unban those either.
  *   Non-availability fields (base power, PP, effects, tiers, ...) are left
  *   exactly as Champions defines them.
  *
@@ -76,6 +62,7 @@ export const Scripts: ModdedBattleScriptsData = {
 	},
 	init() {
 		const baseDex = this.mod('base');
+		const alwaysUnlockedTags = ['Past', 'Unobtainable'];
 
 		for (const id in this.data.Learnsets) {
 			if (baseDex.species.get(id).isNonstandard) continue;
@@ -87,29 +74,20 @@ export const Scripts: ModdedBattleScriptsData = {
 			const ownTable = this.data[dataType] as AnyObject;
 			const baseTable = baseDex.data[dataType] as AnyObject;
 			for (const id in ownTable) {
-				if (!ownTable[id]?.isNonstandard) continue;
-				if (baseTable[id]?.isNonstandard) continue;
+				const isNonstandard = ownTable[id]?.isNonstandard;
+				if (!isNonstandard) continue;
+				const gen9Allows = !baseTable[id]?.isNonstandard;
+				if (!gen9Allows && !alwaysUnlockedTags.includes(isNonstandard)) continue;
 				const entry = this.modData(dataType, id);
 				delete entry.isNonstandard;
-				// Champions restricts this species (Arceus formes, etc.) while
-				// Gen 9 doesn't, so its "tier" field is still Champions' stale
-				// "Illegal" - swap in Gen 9's own tier now that it's available.
-				if (dataType === 'FormatsData' && baseTable[id]?.tier) entry.tier = baseTable[id].tier;
+				if (dataType !== 'FormatsData') continue;
+				// Its "tier" field is still stale ("Illegal" from Champions, or
+				// whatever Champions had it as) - swap in Gen 9's own tier (its
+				// National Dex one preferably, for species Gen 9 itself restricts)
+				// now that it's available.
+				const baseEntry = baseTable[id] as AnyObject | undefined;
+				entry.tier = baseEntry?.natDexTier || baseEntry?.tier || entry.tier;
 			}
-		}
-
-		// Species tagged "Past" (unlike "Future"/"CAP"/"LGPE"/"Custom") are
-		// unlocked even when both Gen 9 and Champions restrict them - matching
-		// National Dex's "+Past" rule (dex-formats.ts's Obtainable check treats
-		// them the same way once that rule/tag is active). Gen 9's National Dex
-		// tier is the natural fit here when it has one.
-		for (const id in this.data.FormatsData) {
-			const entry = this.data.FormatsData[id] as AnyObject;
-			if (entry?.isNonstandard !== 'Past') continue;
-			const owned = this.modData('FormatsData', id);
-			delete owned.isNonstandard;
-			const baseEntry = baseDex.data.FormatsData[id] as AnyObject | undefined;
-			owned.tier = baseEntry?.natDexTier || baseEntry?.tier || owned.tier;
 		}
 
 		// Force-unlock any still-restricted prevo of a now-available species
